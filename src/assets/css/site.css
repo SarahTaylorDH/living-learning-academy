@@ -393,10 +393,18 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .invite__statement { font: 700 24px/1.3 var(--serif) !important; color: var(--navy); text-align: center; margin-top: 18px; }
 .invite--wide .approach__banner { margin: 8px 0 14px; }
 
-/* Mentors & educators: category links */
-.cat-links { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-wrap: wrap; gap: 10px; }
-.cat-links a { display: inline-block; padding: 8px 14px; background: #fff; border: 1px solid #ddd5c6; border-radius: 999px; color: var(--navy); text-decoration: none; font-weight: 600; }
-.cat-links a:hover, .cat-links a:focus-visible { border-color: var(--gold); color: var(--gold); }
-.area[id] { scroll-margin-top: 110px; }
-.page .cta-row { margin-bottom: 26px; }
-.page .cta-row + .hint { margin-top: -6px; }
+/* Mentors & educators: "See what you could teach" (read-only, no links) */
+.lead--choose { margin-top: 4px; }
+.teach { margin: 6px 0 22px; background: #fff; border: 2px solid var(--gold); border-radius: 6px; box-shadow: 0 3px 14px rgba(169, 120, 56, .18); }
+.teach summary { cursor: pointer; padding: 18px 22px; font: 700 14px/1.3 var(--sans, Arial, sans-serif); letter-spacing: .12em; text-transform: uppercase; color: var(--navy); list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.teach summary::-webkit-details-marker { display: none; }
+.teach summary::after { content: "+"; font-size: 28px; font-weight: 400; color: var(--gold); line-height: 1; }
+.teach[open] summary::after { content: "\2212"; }
+.teach summary:hover, .teach summary:focus-visible { background: #fff8ea; }
+.teach[open] summary { border-bottom: 1px solid #ddd5c6; }
+.teach > h3 { margin: 18px 20px 8px; font: 700 13px/1 var(--sans, Arial, sans-serif); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.area-grid--read { padding: 0 14px 14px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); list-style: none; margin: 0; }
+.area-grid--read .area { background: #faf7ee; padding: 12px 14px; box-shadow: none; }
+.area-grid--read h4 { margin: 0 0 4px; font: 700 16px/1.3 var(--serif); color: var(--navy); }
+.area-grid--read p { margin: 0; font-size: 14px; line-height: 1.45; }
+.page .cta-row { margin-bottom: 22px; }
