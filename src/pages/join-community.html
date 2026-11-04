@@ -1,0 +1,45 @@
+<!--{"title":"Join the Community Waitlist","description":"Join the waitlist for LLA’s private communities for parents, educators, mentors and teens 13 and older, or request an event in your community.","path":"/join/community/","scripts":["/assets/js/forms.js"]}-->
+
+<section class="page-hero">
+  <p class="eyebrow eyebrow--light">Community &amp; Events</p>
+  <h1>Join the Community Waitlist.</h1>
+  <p>Our two private Facebook communities open soon. Join the waitlist, and we’ll invite you (and your teen) when they launch.</p>
+</section>
+
+<div class="form-shell">
+  <!--#include form-switcher-->
+  <form class="lla-form form-card" data-form-type="community" novalidate>
+    <!--#include form-top-->
+    <p class="form-intro">A short application and follow-up help create a safer, more comfortable network.</p>
+    <!--#include contact-fields-->
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">Which community would you like to join?</legend>
+      <div class="choices choices--stack" data-options="COMMUNITIES" data-name="communities"></div>
+      <p class="error" data-error-for="communities" hidden></p>
+      <div class="field consent-box" data-show-when="communities=teens" hidden>
+        <label class="choice"><input type="checkbox" name="teen_permission"> <span>My teen is 13 or older, and I give permission for them to join the LLA teen community.</span></label>
+        <p class="error" data-error-for="teen_permission" hidden></p>
+        <p class="hint">When the community opens, we’ll send you the steps for your teen to join.</p>
+      </div>
+      <fieldset class="field"><legend>Topics you care about <span class="optional">(optional)</span></legend>
+        <div class="choices" data-options="COURSE_OPTIONS" data-name="interests"></div>
+        <div class="choices" data-options="PROGRAM_OPTIONS" data-name="interests"></div>
+      </fieldset>
+    </fieldset>
+
+    <fieldset class="form-section" id="event-request">
+      <legend class="form-section__title">Request an event <span class="optional">(optional)</span></legend>
+      <p>We host leadership and culture events that inspire and inform teens, plus workshops on a wide range of life skills and leadership topics.</p>
+      <div class="field">
+        <label for="event_request">What event, workshop or speaker would you like in your community?</label>
+        <textarea id="event_request" name="event_request" maxlength="2000"></textarea>
+        <p class="error" data-error-for="event_request" hidden></p>
+      </div>
+    </fieldset>
+
+    <!--#include consents-->
+    <div class="form-actions"><button class="btn btn--gold btn--lg" type="submit">Submit <span aria-hidden="true">→</span></button></div>
+    <a id="thanks-link" href="/join/thanks/" hidden>Thank you</a>
+  </form>
+</div>

@@ -1,0 +1,60 @@
+<!--{"title":"Request a Course in Your Area","description":"Tell Living Learning Academy which courses and hands-on programs you’d like in your community and how many students might attend.","path":"/join/request-course/","scripts":["/assets/js/forms.js"]}-->
+
+<section class="page-hero">
+  <p class="eyebrow eyebrow--light">Courses Near You</p>
+  <h1>Request a Course in Your Area.</h1>
+  <p>Tell us which courses and programs you’d like in your community and how many students you think would attend.</p>
+</section>
+
+<div class="form-shell">
+  <!--#include form-switcher-->
+  <form class="lla-form form-card" data-form-type="course_request" novalidate>
+    <!--#include form-top-->
+    <!--#include contact-fields-->
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">What would you like in your area? <span class="req" aria-hidden="true">*</span></legend>
+      <p class="choices__group">Courses</p>
+      <div class="choices" data-options="COURSE_OPTIONS" data-name="requested"></div>
+      <p class="choices__group">Hands-on programs</p>
+      <div class="choices" data-options="PROGRAM_OPTIONS" data-name="requested"></div>
+      <label class="choice"><input type="checkbox" name="requested" value="other"> <span>Something else</span></label>
+      <p class="error" data-error-for="requested" hidden></p>
+      <div class="field" data-show-when="requested=other" hidden>
+        <label for="requested_other">What else would you like?</label>
+        <input id="requested_other" name="requested_other" type="text" maxlength="200">
+        <p class="error" data-error-for="requested_other" hidden></p>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">Who would attend?</legend>
+      <div class="row-2">
+        <div class="field">
+          <label for="expected_students">How many students do you think would attend? <span class="req" aria-hidden="true">*</span></label>
+          <input id="expected_students" name="expected_students" type="number" min="1" max="1000" inputmode="numeric" required>
+          <p class="error" data-error-for="expected_students" hidden></p>
+        </div>
+        <div class="field">
+          <label for="organization_type">Are you asking for a group? <span class="optional">(optional)</span></label>
+          <select id="organization_type" name="organization_type" data-options="ORG_TYPES"><option value="">Just me / my family</option></select>
+          <p class="error" data-error-for="organization_type" hidden></p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="organization_name">Group, church or school name <span class="optional">(optional)</span></label>
+        <input id="organization_name" name="organization_name" type="text" maxlength="120">
+        <p class="error" data-error-for="organization_name" hidden></p>
+      </div>
+      <div class="field">
+        <label for="message">Anything else we should know? <span class="optional">(optional)</span></label>
+        <textarea id="message" name="message" maxlength="2000"></textarea>
+        <p class="error" data-error-for="message" hidden></p>
+      </div>
+    </fieldset>
+
+    <!--#include consents-->
+    <div class="form-actions"><button class="btn btn--gold btn--lg" type="submit">Submit <span aria-hidden="true">→</span></button></div>
+    <a id="thanks-link" href="/join/thanks/" hidden>Thank you</a>
+  </form>
+</div>

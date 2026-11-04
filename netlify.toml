@@ -1,0 +1,7 @@
+# Netlify settings (Cloudflare Pages: build command "node scripts/build.mjs", output "dist").
+[build]
+  command = "node scripts/build.mjs"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
