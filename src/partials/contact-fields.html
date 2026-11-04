@@ -1,0 +1,39 @@
+<fieldset class="form-section">
+  <legend class="form-section__title">Your details</legend>
+  <div class="row-2">
+    <div class="field">
+      <label for="full_name">Full name <span class="req" aria-hidden="true">*</span></label>
+      <input id="full_name" name="full_name" type="text" autocomplete="name" required maxlength="120">
+      <p class="error" data-error-for="full_name" hidden></p>
+    </div>
+    <div class="field">
+      <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+      <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254">
+      <p class="error" data-error-for="email" hidden></p>
+    </div>
+    <div class="field">
+      <label for="phone">Cell phone <span class="req" data-phone-req hidden aria-hidden="true">*</span></label>
+      <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="403 555 1234">
+      <p class="error" data-error-for="phone" hidden></p>
+      <label class="choice choice--small"><input type="checkbox" name="sms_opt_in"> You can text me about LLA courses and events</label>
+    </div>
+    <div class="field">
+      <label for="postal_code">Postal code <span class="req" aria-hidden="true">*</span></label>
+      <span class="hint" id="postal_code-hint">Helps us plan courses within driving distance of you.</span>
+      <input id="postal_code" name="postal_code" type="text" autocomplete="postal-code" required maxlength="10" aria-describedby="postal_code-hint" style="text-transform:uppercase">
+      <p class="error" data-error-for="postal_code" hidden></p>
+    </div>
+    <div class="field">
+      <label for="city">City or town <span class="req" aria-hidden="true">*</span></label>
+      <input id="city" name="city" type="text" autocomplete="address-level2" required maxlength="120">
+      <p class="error" data-error-for="city" hidden></p>
+    </div>
+    <div class="field">
+      <label for="province">Province or territory <span class="req" aria-hidden="true">*</span></label>
+      <select id="province" name="province" autocomplete="address-level1" required data-options="PROVINCES">
+        <option value="">Choose…</option>
+      </select>
+      <p class="error" data-error-for="province" hidden></p>
+    </div>
+  </div>
+</fieldset>

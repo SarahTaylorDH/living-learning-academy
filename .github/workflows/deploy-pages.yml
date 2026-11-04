@@ -19,29 +19,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.25.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Build the GitHub Pages site
-        env:
-          GITHUB_PAGES: "true"
-          NEXT_PUBLIC_BASE_PATH: ""
-          NEXT_PUBLIC_INTEREST_ENDPOINT: https://living-learning-academy.daniel4freedom.chatgpt.site/api/interest
+      - name: Test
+        run: node --test tests/*.test.mjs
+      - name: Build the site
+        run: node scripts/build.mjs
+      - name: Keep the custom domain and skip Jekyll
         run: |
-          rm -rf app/api
-          pnpm exec next build
-          touch out/.nojekyll
+          cp CNAME dist/CNAME
+          touch dist/.nojekyll
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: out
+          path: dist
 
   deploy:
     environment:

@@ -1,0 +1,76 @@
+<!--{"title":"Join the Waitlist","description":"Join the Living Learning Academy waitlist. Tell us your children’s ages and interests, and be first to hear about courses and hands-on programs near you.","path":"/join/","scripts":["/assets/js/forms.js"]}-->
+
+<section class="page-hero">
+  <p class="eyebrow eyebrow--light">Get Early Access</p>
+  <h1>Join the Waitlist.</h1>
+  <p>Tell us about your family, and we’ll let you know first when courses and hands-on programs open near you.</p>
+</section>
+
+<div class="form-shell">
+  <!--#include form-switcher-->
+  <form class="lla-form form-card" data-form-type="parent" novalidate>
+    <!--#include form-top-->
+    <!--#include contact-fields-->
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">Your children</legend>
+      <p class="hint">Add each child so we can see what they’re interested in. Please don’t include names.</p>
+      <div data-children></div>
+      <p class="error" data-error-for="children" hidden></p>
+      <button type="button" class="btn btn--outline btn--sm" data-add-child>+ Add another child</button>
+    </fieldset>
+
+    <template id="child-template">
+      <div class="child">
+        <div class="child__head">
+          <h3 class="child__title">Child 1</h3>
+          <button type="button" class="link-btn" data-remove-child>Remove</button>
+        </div>
+        <fieldset class="field">
+          <legend>Age group <span class="req" aria-hidden="true">*</span></legend>
+          <div class="choices choices--row" data-options="AGE_RANGES" data-type="radio" data-name="children.__i__.age_range"></div>
+          <p class="error" data-error-for="children.__i__.age_range" hidden></p>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Gender <span class="req" aria-hidden="true">*</span></legend>
+          <div class="choices choices--row" data-options="GENDERS" data-type="radio" data-name="children.__i__.gender"></div>
+          <p class="error" data-error-for="children.__i__.gender" hidden></p>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Interests <span class="optional">(choose any)</span></legend>
+          <p class="choices__group">Courses</p>
+          <div class="choices" data-options="COURSE_OPTIONS" data-name="children.__i__.interests"></div>
+          <p class="choices__group">Hands-on programs</p>
+          <div class="choices" data-options="PROGRAM_OPTIONS" data-name="children.__i__.interests"></div>
+        </fieldset>
+      </div>
+    </template>
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">Tell us more <span class="optional">(optional)</span></legend>
+      <fieldset class="field"><legend>How are your children schooled today?</legend><div class="choices" data-options="SCHOOLING" data-name="schooling"></div></fieldset>
+      <fieldset class="field"><legend>When and how could your children take part?</legend><div class="choices" data-options="FORMATS" data-name="formats"></div></fieldset>
+      <fieldset class="field" data-show-when="formats=weekdays" hidden>
+        <legend>Which weekdays are your children free?</legend>
+        <div class="choices choices--row" data-options="WEEKDAYS" data-name="weekdays"></div>
+        <p class="error" data-error-for="weekdays" hidden></p>
+      </fieldset>
+      <div class="field">
+        <label for="learn_wish">What would you love your children to learn?</label>
+        <span class="hint">A skill, a subject or a life lesson. Anything goes.</span>
+        <textarea id="learn_wish" name="learn_wish" maxlength="2000"></textarea>
+        <p class="error" data-error-for="learn_wish" hidden></p>
+      </div>
+      <div class="field">
+        <label for="values_gap">Is there anything your children aren’t getting in school, or are being taught in a way that doesn’t line up with your family’s values?</label>
+        <span class="hint">We use this only to plan courses.</span>
+        <textarea id="values_gap" name="values_gap" maxlength="2000"></textarea>
+        <p class="error" data-error-for="values_gap" hidden></p>
+      </div>
+    </fieldset>
+
+    <!--#include consents-->
+    <div class="form-actions"><button class="btn btn--gold btn--lg" type="submit">Submit <span aria-hidden="true">→</span></button></div>
+    <a id="thanks-link" href="/join/thanks/" hidden>Thank you</a>
+  </form>
+</div>

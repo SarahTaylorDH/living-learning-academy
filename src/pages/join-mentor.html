@@ -1,0 +1,46 @@
+<!--{"title":"Become a Mentor","description":"Have valuable skills to pass on to the next generation? Tell Living Learning Academy what you could teach and why you’d like to help.","path":"/join/mentor/","scripts":["/assets/js/forms.js"]}-->
+
+<section class="page-hero">
+  <p class="eyebrow eyebrow--light">Teaching &amp; Curriculum</p>
+  <h1>Become an LLA Mentor.</h1>
+  <p>Have valuable skills to pass on to the next generation? Tell us what you could teach and why you’d like to help.</p>
+</section>
+
+<div class="form-shell">
+  <!--#include form-switcher-->
+  <form class="lla-form form-card" data-form-type="mentor" novalidate>
+    <!--#include form-top-->
+    <!--#include contact-fields-->
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">What could you teach? <span class="req" aria-hidden="true">*</span></legend>
+      <p class="hint">Choose every area that fits your skills.</p>
+      <p class="choices__group">Courses</p>
+      <div class="choices" data-options="COURSE_OPTIONS" data-name="skills"></div>
+      <p class="choices__group">Hands-on programs</p>
+      <div class="choices" data-options="PROGRAM_OPTIONS" data-name="skills"></div>
+      <label class="choice"><input type="checkbox" name="skills" value="other"> <span>Something else</span></label>
+      <p class="error" data-error-for="skills" hidden></p>
+      <div class="field" data-show-when="skills=other" hidden>
+        <label for="skills_other">What else could you teach?</label>
+        <input id="skills_other" name="skills_other" type="text" maxlength="200">
+        <p class="error" data-error-for="skills_other" hidden></p>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend class="form-section__title">A little more about you</legend>
+      <div class="field">
+        <label for="motivation">Why would you like to help teach the next generation of leaders? <span class="req" aria-hidden="true">*</span></label>
+        <span class="hint">Tell us about your experience and what you’d love to pass on.</span>
+        <textarea id="motivation" name="motivation" maxlength="2000" required></textarea>
+        <p class="error" data-error-for="motivation" hidden></p>
+      </div>
+      <label class="choice"><input type="checkbox" name="has_children"> <span>I also have children who may want to take part. <span class="hint-inline">We’ll invite you to add them next.</span></span></label>
+    </fieldset>
+
+    <!--#include consents-->
+    <div class="form-actions"><button class="btn btn--gold btn--lg" type="submit">Submit <span aria-hidden="true">→</span></button></div>
+    <a id="thanks-link" href="/join/thanks/" hidden>Thank you</a>
+  </form>
+</div>
