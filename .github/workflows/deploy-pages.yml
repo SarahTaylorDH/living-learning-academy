@@ -25,6 +25,10 @@ jobs:
       - name: Test
         run: node --test tests/*.test.mjs
       - name: Build the site
+        env:
+          # Public values (safe in the site). Repository variables override them if set.
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://xvohkszqihispaabdpya.supabase.co' }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || 'sb_publishable_p45hqI8DXr71o8roQc1Y0g_H0YJfzj8' }}
         run: node scripts/build.mjs
       - name: Keep the custom domain and skip Jekyll
         run: |
