@@ -13,6 +13,7 @@
 ## Waiting on accounts or credentials
 - [ ] **Supabase:** run the migration and add `SUPABASE_URL` and `SUPABASE_ANON_KEY` (DEPLOY.md). Until then the forms show "Preview mode" and save nothing.
 - [ ] **Confirmation emails:** Resend account, domain verification, function deploy and webhook (EMAILS.md). The function code has not been run against Resend yet, so test it once these are set up.
+- [ ] **e-Transfer Autodeposit:** turn on Interac Autodeposit for **donate@livinglearningacademy.com** in LLA's online banking, so donations go straight into the account with no security question. Added Nov 11, 2026.
 - [ ] **Online donations:** Stripe Payment Link → `DONATE_URL` (DONATIONS.md). The e-Transfer option works now.
 - [ ] **Hosting** (Cloudflare Pages or Netlify), then the domain switch after approval.
 
