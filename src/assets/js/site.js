@@ -98,3 +98,18 @@ document.documentElement.classList.add('js');
   }
   if (!(reduce || slow)) start();
 })();
+
+// "Copy" buttons, e.g. the e-Transfer email on the Donate page: <button data-copy="text"><span class="copy-label">Copy</span></button>
+(function () {
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    var label = btn.querySelector('.copy-label') || btn;
+    var original = label.textContent;
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      var done = function (msg) { label.textContent = msg; setTimeout(function () { label.textContent = original; }, 2500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done('Copied! Now paste it in your bank app'); }, function () { done(text); });
+      } else { done(text); }
+    });
+  });
+})();
