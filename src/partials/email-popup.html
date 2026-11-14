@@ -1,0 +1,28 @@
+<dialog class="invite emailpop" id="email-popup" aria-labelledby="emailpop-title" data-email-popup>
+  <form method="dialog" class="invite__close-form"><button class="invite__close" aria-label="Close">×</button></form>
+  <div data-popup-form>
+    <p class="eyebrow">Living Learning Academy</p>
+    <h2 id="emailpop-title">Be the first to <em>hear what’s coming.</em></h2>
+    <p class="emailpop__lead">Get news about LLA’s courses, hands-on programs and events, straight to your inbox.</p>
+    <form class="emailpop__form" novalidate>
+      <div class="field">
+        <label for="emailpop-name">First name <span class="optional">(optional)</span></label>
+        <input id="emailpop-name" name="first_name" type="text" autocomplete="given-name" maxlength="60">
+      </div>
+      <div class="field">
+        <label for="emailpop-email">Email <span class="req" aria-hidden="true">*</span></label>
+        <input id="emailpop-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required>
+        <p class="error" data-popup-error hidden></p>
+      </div>
+      <div class="field emailpop__hp" aria-hidden="true"><label>Leave this empty <input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
+      <label class="choice emailpop__consent"><input type="checkbox" name="consent" required> <span>Yes, email me LLA news, courses and events. I can unsubscribe at any time. See our <a href="/privacy/">Privacy Policy</a>.</span></label>
+      <button type="submit" class="btn btn--gold btn--lg emailpop__submit">Keep Me Updated <span aria-hidden="true">→</span></button>
+    </form>
+    <form method="dialog"><button class="link-btn">No thanks</button></form>
+  </div>
+  <div class="emailpop__done" data-popup-done hidden>
+    <h2>Thank you!</h2>
+    <p>You’re on the list. We’ll share news about courses and events as they open.</p>
+    <form method="dialog"><button class="btn btn--navy">Close</button></form>
+  </div>
+</dialog>

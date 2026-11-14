@@ -100,6 +100,7 @@ async function build() {
 
   const header = await readFile(path.join(SRC, 'partials', 'header.html'), 'utf8');
   const footer = await readFile(path.join(SRC, 'partials', 'footer.html'), 'utf8');
+  const popupHtml = await readFile(path.join(SRC, 'partials', 'email-popup.html'), 'utf8');
   const files = (await readdir(path.join(SRC, 'pages'))).filter(f => f.endsWith('.html')).sort();
   const sitemap = [];
 
@@ -136,6 +137,7 @@ ${meta.noindex ? '<meta name="robots" content="noindex">\n' : ''}<link rel="cano
 <link rel="stylesheet" href="/assets/css/site.css">
 ${meta.preload ? meta.preload.map(p => `<link rel="preload" as="image" href="${p}" fetchpriority="high">`).join('\n') + '\n' : ''}<script src="/assets/js/config.js" defer></script>
 <script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/popup.js" defer></script>
 ${(meta.scripts || []).map(s => `<script type="module" src="${s}"></script>`).join('\n')}
 </head>
 <body class="${esc(meta.bodyClass || '')}">
@@ -144,6 +146,7 @@ ${headerHtml}
 <main id="main">
 ${body.trim()}
 </main>
+${popupHtml}
 ${footer.replace('{{year}}', String(new Date().getFullYear()))}
 </body>
 </html>
