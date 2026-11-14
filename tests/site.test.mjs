@@ -148,3 +148,16 @@ test('parent and student survey pages exist and For Parents links to both', () =
     assert.match(readFileSync(path.join(DIST, `${k}-survey/index.html`), 'utf8'), new RegExp(`data-respondent="${k}"`));
   }
 });
+
+test('every page carries the email pop-up, which saves as the "updates" form type the database allows', () => {
+  for (const p of pages) {
+    const html = readFileSync(p, 'utf8');
+    assert.match(html, /id="email-popup"/, p);
+    assert.match(html, /assets\/js\/popup\.js/, p);
+  }
+  const js = readFileSync(path.join(ROOT, 'src/assets/js/popup.js'), 'utf8');
+  assert.match(js, /form_type: 'updates'/);
+  assert.match(js, /privacy_consent: true/);
+  const sql = readFileSync(path.join(ROOT, 'supabase/migrations/20261114010000_email_popup.sql'), 'utf8');
+  assert.match(sql, /'updates'/);
+});
