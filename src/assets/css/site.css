@@ -419,3 +419,11 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .bible-options p { font: 400 15.5px/1.55 var(--serif); flex: 1; }
 .bible-options .btn { align-self: flex-start; }
 @media (max-width: 640px) { .bible-options .btn { align-self: stretch; justify-content: space-between; } }
+
+/* Parent & student survey */
+.survey-form .form-section__title { display: flex; align-items: center; gap: 12px; }
+.survey-num { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: #fff; font: 700 16px/1 var(--sans); }
+.survey-form textarea { width: 100%; min-height: 96px; padding: 12px 14px; font: 400 16px/1.5 var(--sans); border: 1px solid #c9c0ad; border-radius: 4px; box-sizing: border-box; }
+.survey-thanks { text-align: center; padding: 40px 24px; }
+.survey-thanks[hidden], .survey-form[hidden] { display: none; }
+.offer--survey { margin-top: 8px; border-top-width: 4px; }
