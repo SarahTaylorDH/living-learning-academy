@@ -17,12 +17,6 @@ form.querySelectorAll('[data-options]').forEach((el) => {
   el.innerHTML = Object.entries(list).map(([v, l]) => `<label class="choice"><input type="${type}" name="${el.dataset.name}" value="${v}"> <span>${l}</span></label>`).join('');
 });
 
-// Show the "a parent knows" box only for students.
-function syncConditional() {
-  const respondent = form.querySelector('input[name="respondent"]:checked')?.value;
-  form.querySelectorAll('[data-show-when]').forEach((el) => { el.hidden = el.dataset.showWhen !== `respondent=${respondent}`; });
-}
-form.addEventListener('change', syncConditional);
 
 function status(kind, html) {
   const wrap = form.querySelector('[data-status]');
@@ -30,7 +24,7 @@ function status(kind, html) {
 }
 
 function read() {
-  const v = {};
+  const v = { respondent: form.dataset.respondent };
   for (const el of form.elements) {
     if (!el.name || el.name === 'website') continue;
     if (el.type === 'checkbox' && form.querySelectorAll(`[name="${el.name}"]`).length > 1) (v[el.name] ||= []).push(...(el.checked ? [el.value] : []));

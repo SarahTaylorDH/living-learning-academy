@@ -140,8 +140,11 @@ test('preview (--relative) build also rewrites the hero video addresses', () => 
   execFileSync(process.execPath, [path.join(ROOT, 'scripts/build.mjs')], { stdio: 'pipe' });   // restore the normal build
 });
 
-test('survey page exists and For Parents links to it', () => {
-  assert.ok(existsSync(path.join(DIST, 'survey/index.html')));
-  assert.match(readFileSync(path.join(DIST, 'families/index.html'), 'utf8'), /href="\/survey\/"/);
-  assert.match(readFileSync(path.join(DIST, 'survey/index.html'), 'utf8'), /survey\.js/);
+test('parent and student survey pages exist and For Parents links to both', () => {
+  const fam = readFileSync(path.join(DIST, 'families/index.html'), 'utf8');
+  for (const k of ['parent', 'student']) {
+    assert.ok(existsSync(path.join(DIST, `${k}-survey/index.html`)));
+    assert.match(fam, new RegExp(`href="/${k}-survey/"`));
+    assert.match(readFileSync(path.join(DIST, `${k}-survey/index.html`), 'utf8'), new RegExp(`data-respondent="${k}"`));
+  }
 });
