@@ -123,3 +123,21 @@ test('course and program lists are complete', () => {
   assert.equal(Object.keys(PROGRAMS).length, 8);
   for (const p of Object.values(PROGRAMS)) assert.ok(p.labels.every((l) => ['CW', 'CV'].includes(l)));
 });
+
+import { validateSurvey as _vs, OPTION_LISTS as _OL } from '../src/assets/js/validate.mjs';
+test('survey: valid parent answer passes', () => {
+  const { errors, data } = _vs({ respondent: 'parent', ages: [Object.keys(_OL.AGE_RANGES)[0]], topics: ['public-speaking'], privacy_consent: true });
+  assert.deepEqual(errors, {});
+  assert.equal(data.respondent, 'parent');
+});
+test('survey: requires respondent, ages, topics and consent; student needs parent-knows', () => {
+  const { errors } = _vs({ respondent: 'student' });
+  for (const k of ['student_ok', 'ages', 'topics', 'privacy_consent']) assert.ok(errors[k], k);
+  assert.ok(_vs({}).errors.respondent);
+});
+test('survey: follow-up needs a valid email', () => {
+  const base = { respondent: 'parent', ages: [Object.keys(_OL.AGE_RANGES)[0]], topics: ['public-speaking'], privacy_consent: true };
+  assert.ok(_vs({ ...base, wants_follow_up: true }).errors.email);
+  assert.ok(_vs({ ...base, email: 'nope' }).errors.email);
+  assert.deepEqual(_vs({ ...base, wants_follow_up: true, email: 'a@b.ca' }).errors, {});
+});

@@ -196,3 +196,51 @@ export function validateSubmission(formType, input) {
 
   return { data, children, errors };
 }
+
+// ------------------------------------------------------------------ parent / student survey (its own table: survey_responses)
+export const SURVEY_RESPONDENTS = { parent: 'A parent or guardian', student: 'A student' };
+export const SURVEY_FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Hands-on programs and day camps' };
+export const SURVEY_BUDGETS = { 'under-150': 'Under $150', '150-250': '$150 to $250', '250-350': '$250 to $350', '350-plus': '$350 or more', unsure: 'Not sure yet' };
+export const SURVEY_HEARD = { friend: 'A friend or family member', church: 'Church or ministry', social: 'Social media', search: 'Online search', school: 'School or co-op', event: 'An event', other: 'Somewhere else' };
+export const SURVEY_TOPICS = { ...COURSE_OPTIONS, ...PROGRAM_OPTIONS };
+OPTION_LISTS.SURVEY_RESPONDENTS = SURVEY_RESPONDENTS; OPTION_LISTS.SURVEY_FORMATS = SURVEY_FORMATS;
+OPTION_LISTS.SURVEY_BUDGETS = SURVEY_BUDGETS; OPTION_LISTS.SURVEY_HEARD = SURVEY_HEARD; OPTION_LISTS.SURVEY_TOPICS = SURVEY_TOPICS;
+
+/** Validates the survey. Returns { data, errors }; `data` is one row for survey_responses. No names or health details are collected. */
+export function validateSurvey(input) {
+  const errors = {};
+  const data = {
+    respondent: clean(input.respondent),
+    student_ok: yes(input.student_ok),
+    ages: pick(input.ages, AGE_RANGES),
+    schooling: pick(input.schooling, SCHOOLING),
+    topics: pick(input.topics, SURVEY_TOPICS),
+    formats: pick(input.formats, SURVEY_FORMATS),
+    days: pick(input.days, AVAILABILITY),
+    budget: clean(input.budget) || null,
+    how_heard: clean(input.how_heard) || null,
+    learn_wish: '', concerns: '',
+    first_name: clean(input.first_name).slice(0, 60) || null,
+    email: clean(input.email).toLowerCase() || null,
+    city: clean(input.city) || null,
+    province: clean(input.province) || null,
+    wants_follow_up: yes(input.wants_follow_up),
+    privacy_consent: yes(input.privacy_consent),
+    consent_version: CONSENT_VERSION,
+  };
+  if (!(data.respondent in SURVEY_RESPONDENTS)) errors.respondent = 'Please tell us who is answering.';
+  if (data.respondent === 'student' && !data.student_ok) errors.student_ok = 'Please tick this box. A parent or guardian needs to know you’re doing this survey.';
+  if (!data.ages.length) errors.ages = 'Please choose at least one age group.';
+  if (!data.topics.length) errors.topics = 'Please choose at least one topic.';
+  if (data.budget && !(data.budget in SURVEY_BUDGETS)) data.budget = null;
+  if (data.how_heard && !(data.how_heard in SURVEY_HEARD)) data.how_heard = null;
+  longText(data, errors, 'learn_wish', input.learn_wish);
+  longText(data, errors, 'concerns', input.concerns);
+  data.learn_wish ||= null; data.concerns ||= null;
+  if (data.email && (!EMAIL_RE.test(data.email) || data.email.length > 254)) errors.email = 'Please enter a valid email address, or leave this blank.';
+  if (data.wants_follow_up && !data.email) errors.email = 'Please add your email so we can follow up.';
+  if (data.province && !(data.province in PROVINCES)) data.province = null;
+  if (data.city && data.city.length > 120) errors.city = 'Please keep this under 120 characters.';
+  if (!data.privacy_consent) errors.privacy_consent = 'Please tick this box so we can save your answers.';
+  return { data, errors };
+}
