@@ -123,7 +123,9 @@ body.reg-lock { overflow: hidden; }
 .reg-more { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
 
 @media (max-width: 640px) {
-  .reg-row { grid-template-columns: 1fr auto; }
+  .reg-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 18px 20px; }
+  .reg-row > span { min-width: 0; }
+  .reg-row__cta { justify-self: start; }
   .reg-row__time { grid-column: 1 / -1; }
   .reg-row .tag { display: none; }
   .reg-facts li { border-right: 0; border-bottom: 1px solid #eee7da; }
