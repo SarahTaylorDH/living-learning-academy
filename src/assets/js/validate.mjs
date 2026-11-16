@@ -41,7 +41,7 @@ export const PROGRAMS = {
   'self-defence': { name: 'Self-Defence & Character', labels: ['CW'], desc: 'Develop personal safety skills, sound judgment and self-control.' },
   'music-dance': { name: 'Music, Dance & Character', labels: ['CW'], desc: 'Build creative skills, discipline and teamwork through music and movement.' },
   'beauty-character': { name: 'Beauty & Character', labels: ['CW'], desc: 'Explore hair, makeup and personal care grounded in dignity, self-respect and biblical beauty.' },
-  'etiquette-character': { name: 'Etiquette & Character', labels: ['CW'], desc: 'Practise good manners, build social confidence and learn to understand and appreciate biological differences.' },
+  'etiquette-character': { name: 'Etiquette & Character', labels: ['CW'], desc: 'Practice good manners, build social confidence and learn to understand and appreciate biological differences.' },
   'fitness-character': { name: 'Fitness & Character', labels: ['CW', 'CV'], desc: 'Build strength, healthy habits, good character and perseverance through exercise.' },
 };
 
