@@ -15,8 +15,12 @@
   var COURSES = [
     { slug: 'music-theatre', name: 'LLA Music Theatre & Character', ref: 'LLA Music Theatre', time: '9–11 am', ages: '12–18', fw: 'CW',
       mentor: 'Natalia Pardalis', creds: 'Award-Winning Jazz Vocalist · Music Educator · Owner, Pardalis Studio of Music',
-      blurb: 'Build creative skills, stage confidence and teamwork through music and performance.',
-      learn: ['Singing and healthy vocal technique', 'Stage presence and acting basics', 'Rehearsing and performing as an ensemble'],
+      hook: 'Give your teen the confidence to step onto a stage, and into any room.',
+      blurb: 'Teens learn to sing, act and bring a character to life, then perform a musical number together.',
+      learn: ['Basic singing technique and healthy vocal habits', 'Common theatre terms and stage skills', 'Bringing a character to life through song and acting', 'Performing a musical number together, with choreography, spoken lines and possible solos'],
+      climb: [['C', 'Character: discipline, encouragement and grace in rehearsal'], ['L', 'Leadership: the courage to perform and lift up the ensemble'], ['I', 'Independent thinking: interpreting a character and story'], ['M', 'Mastery of life skills: confident speaking, teamwork and focus'], ['B', 'Building impact: a performance that blesses its audience']],
+      faith: 'Taught from a Christian worldview: students are reminded that their gifts and talents come from God, and learn to use them to glorify Him and bless those around them. Everyone is welcome.',
+      verse: { text: '“Worship the Lord with gladness; come before him with joyful songs.”', ref: 'Psalm 100:2 (NIV)' },
       squareUrl: '' },
     { slug: 'truth-hunters', name: 'LLA Truth Hunters', ref: 'LLA Truth Hunters', time: '12–2 pm', ages: '6–11', fw: 'CW',
       mentor: 'Drea Humphrey', creds: 'Investigative Journalist · Documentarian · LLA Founder',
@@ -137,8 +141,11 @@
   function viewDetails() {
     var c = state.course;
     return '<div class="reg-body">' +
+      (c.hook ? '<p class="reg-hook">' + esc(c.hook) + '</p>' : '') +
       '<p style="font-size:16.5px">' + esc(c.blurb) + '</p>' +
       '<div><p class="reg-label">What they\'ll learn</p><ul class="reg-points">' + c.learn.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul></div>' +
+      (c.climb ? '<div><p class="reg-label">C.L.I.M.B. in action</p><ul class="reg-climb">' + c.climb.map(function (x) { return '<li><b>' + esc(x[0]) + '</b>' + esc(x[1]) + '</li>'; }).join('') + '</ul></div>' : '') +
+      (c.faith ? '<div class="reg-faith"><p>' + esc(c.faith) + '</p>' + (c.verse ? '<p class="reg-verse">' + esc(c.verse.text) + ' <cite>' + esc(c.verse.ref) + '</cite></p>' : '') + '</div>' : '') +
       '<div class="reg-mentor"><span class="reg-mentor__label">Your Mentor</span><span class="reg-mentor__name">' + esc(c.mentor) + '</span><span class="reg-mentor__creds">' + esc(c.creds) + '</span></div>' +
       '<div class="reg-details">' +
         '<p><strong>When:</strong> Fridays ' + esc(c.time) + ', Jan 8 – Feb 19, 2027</p>' +
