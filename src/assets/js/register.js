@@ -24,7 +24,8 @@
       squareUrl: '' },
     { slug: 'truth-hunters', name: 'LLA Jr. Truth Detectives', ref: 'LLA Jr. Truth', time: '12–2 pm', ages: '6–11', fw: 'CW',
       mentor: 'Drea Humphrey', creds: 'Investigative Journalist · Documentarian · LLA Founder',
-      hook: 'Your junior detective’s first big case: The Mystery of the Missing Ark.',
+      tagline: 'Critical Thinking for Kids', episode: 'Adventure 1: The Mystery of the Missing Ark',
+      hook: 'Your junior detective’s first big case is waiting.',
       blurb: 'Led by Christian investigative journalist Drea Humphrey, children hunt for clues, explore Scripture and investigate the mystery of the Ark of the Covenant.',
       learn: ['Observing carefully and spotting clues', 'What is known about the Ark of the Covenant', 'Asking thoughtful questions and checking claims', 'Drawing conclusions from the evidence'],
       climb: [['C', 'Character: honesty and fairness when weighing evidence'], ['L', 'Leadership: the courage to share findings and work as a team'], ['I', 'Independent thinking: questioning claims and testing what is true'], ['M', 'Mastery of life skills: careful observation, listening and reasoning'], ['B', 'Building impact: using truth to help and encourage others']],
@@ -102,6 +103,12 @@
     return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
   }
 
+  // Optional series lines under a course name (e.g. Jr. Truth Detectives' current adventure).
+  function subtitle(c) {
+    return (c.tagline ? '<span class="reg-tagline">' + esc(c.tagline) + '</span>' : '') +
+      (c.episode ? '<span class="reg-episode">' + esc(c.episode) + '</span>' : '');
+  }
+
   // ------------------------------------------------------------ page lists
   function renderLists() {
     var sched = document.querySelector('[data-reg-schedule]');
@@ -110,7 +117,7 @@
       sched.innerHTML = COURSES.map(function (c) {
         return '<li><button type="button" class="reg-row" data-open="' + c.slug + '">' +
           '<span class="reg-row__time">' + esc(c.time) + '</span>' +
-          '<span><span class="reg-row__name">' + esc(c.name) + '</span><span class="reg-row__meta">Ages ' + esc(c.ages) + ' · ' + esc(c.mentor) + spotsText(c, ' · ') + '</span></span>' +
+          '<span><span class="reg-row__name">' + esc(c.name) + '</span>' + subtitle(c) + '<span class="reg-row__meta">Ages ' + esc(c.ages) + ' · ' + esc(c.mentor) + spotsText(c, ' · ') + '</span></span>' +
           tag(c) + '<span class="reg-row__cta">' + (isFull(c) ? 'Full · Waitlist' : 'Details &amp; Register') + '</span></button></li>';
       }).join('');
     }
@@ -118,7 +125,7 @@
       var html = COURSES.map(function (c) {
         return '<li data-course-card><button type="button" class="reg-card" data-open="' + c.slug + '" id="' + c.slug + '-card">' +
           '<span class="reg-card__top">' + tag(c) + '<span class="reg-when">Fridays · ' + esc(c.time) + '</span></span>' +
-          '<span class="reg-card__name">' + esc(c.name) + '</span>' +
+          '<span class="reg-card__name">' + esc(c.name) + '</span>' + subtitle(c) +
           '<span class="reg-card__ages">Ages ' + esc(c.ages) + spotsText(c, ' · ') + '</span>' +
           '<span class="reg-card__blurb">' + esc(c.blurb) + '</span>' +
           '<span class="reg-learn">' + c.learn.map(function (l) { return '<span>' + esc(l) + '</span>'; }).join('') + '</span>' +
@@ -137,7 +144,7 @@
     var idx = STEPS.indexOf(state.step);
     return '<div class="reg-dialog__head"><div>' +
       '<p class="reg-dialog__tags">' + tag(c) + '<span class="reg-when">Fridays · ' + esc(c.time) + ' · Ages ' + esc(c.ages) + '</span></p>' +
-      '<h2 id="reg-title">' + esc(c.name) + '</h2></div>' +
+      '<h2 id="reg-title">' + esc(c.name) + '</h2>' + subtitle(c) + '</div>' +
       '<button type="button" class="reg-x" data-close aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       '<ol class="reg-steps" aria-label="Step ' + (idx + 1) + ' of 4">' + STEPS.map(function (s, i) { return '<li class="' + (i <= idx ? 'on' : '') + '"></li>'; }).join('') + '</ol>';
   }
