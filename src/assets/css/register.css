@@ -137,3 +137,11 @@ body.reg-lock { overflow: hidden; }
 .reg-area h3 { font-size: 22px; margin: 0 0 4px; }
 .reg-area p { margin: 0; color: var(--muted); }
 @media (max-width: 640px) { .reg-area .btn { width: 100%; justify-content: space-between; } }
+
+/* Course pop-up: headline, C.L.I.M.B. list, faith and scripture box */
+.reg-hook { font: 400 21px/1.3 var(--serif); color: var(--navy); }
+.reg-climb { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 15px; line-height: 1.45; }
+.reg-climb b { display: inline-block; width: 22px; font: 700 15px var(--serif); color: var(--gold-dark); }
+.reg-faith { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--ivory); border-left: 3px solid var(--gold); font: italic 400 15.5px/1.5 var(--serif); color: var(--navy); }
+.reg-verse { font-style: normal; }
+.reg-verse cite { display: block; margin-top: 2px; font: 700 11px/1.4 var(--sans); font-style: normal; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dark); }
