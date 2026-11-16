@@ -93,10 +93,10 @@ test('the Courses & Experiences page lists every course and program the forms of
   }
 });
 
-test('header shows Donate, and the hero waitlist button scrolls to Find Your Place', () => {
+test('header shows Donate, and the hero button goes to Register', () => {
   const home = readFileSync(path.join(DIST, 'index.html'), 'utf8');
   assert.match(home, /<a href="\/donate\/"[^>]*>Donate<\/a>/);
-  assert.match(home, /href="#lla-network">Join the Waitlist/);
+  assert.match(home, /<a class="btn btn--gold" href="\/register\/">Register Now/);
 });
 
 test('every form page posts to a known form type and has a thank-you link', () => {
@@ -149,15 +149,10 @@ test('parent and student survey pages exist and For Parents links to both', () =
   }
 });
 
-test('every page carries the email pop-up, which saves as the "updates" form type the database allows', () => {
+test('no page shows the email sign-up pop-up (removed Nov 16, 2026, now that courses are open)', () => {
   for (const p of pages) {
     const html = readFileSync(p, 'utf8');
-    assert.match(html, /id="email-popup"/, p);
-    assert.match(html, /assets\/js\/popup\.js/, p);
+    assert.doesNotMatch(html, /id="email-popup"/, p);
+    assert.doesNotMatch(html, /assets\/js\/popup\.js/, p);
   }
-  const js = readFileSync(path.join(ROOT, 'src/assets/js/popup.js'), 'utf8');
-  assert.match(js, /form_type: 'updates'/);
-  assert.match(js, /privacy_consent: true/);
-  const sql = readFileSync(path.join(ROOT, 'supabase/migrations/20261114010000_email_popup.sql'), 'utf8');
-  assert.match(sql, /'updates'/);
 });
