@@ -66,7 +66,8 @@
     var n = spots[c.slug];
     if (n == null) return '';
     if (n === 0) return sep + '<strong style="color:#b3261e">Full</strong>';
-    return '';   // spot counts stay private; only "Full" is shown to the public
+    // Counts stay private until a course is nearly full: only 5 or fewer spots left starts the countdown.
+    return n <= 5 ? sep + '<strong style="color:var(--gold-dark)">Only ' + n + ' spot' + (n === 1 ? '' : 's') + ' left</strong>' : '';
   }
   function rpcHeaders() {
     var key = cfg.supabaseAnonKey, h = { apikey: key, 'Content-Type': 'application/json' };
