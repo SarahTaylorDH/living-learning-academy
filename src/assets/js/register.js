@@ -22,10 +22,14 @@
       faith: 'Taught from a Christian worldview: students are reminded that their gifts and talents come from God, and learn to use them to glorify Him and bless those around them. Everyone is welcome.',
       verse: { text: '“Worship the Lord with gladness; come before him with joyful songs.”', ref: 'Psalm 100:2 (NIV)' },
       squareUrl: '' },
-    { slug: 'truth-hunters', name: 'LLA Truth Hunters', ref: 'LLA Truth Hunters', time: '12–2 pm', ages: '6–11', fw: 'CW',
+    { slug: 'truth-hunters', name: 'LLA Jr. Truth Detectives', ref: 'LLA Jr. Truth', time: '12–2 pm', ages: '6–11', fw: 'CW',
       mentor: 'Drea Humphrey', creds: 'Investigative Journalist · Documentarian · LLA Founder',
-      blurb: "Junior detectives solve mysteries while learning to think carefully and discover what's true.",
-      learn: ['Asking good questions', 'Spotting clues and checking the evidence', 'Telling fact from opinion'],
+      hook: 'Your junior detective’s first big case: The Mystery of the Missing Ark.',
+      blurb: 'Led by Christian investigative journalist Drea Humphrey, children hunt for clues, explore Scripture and investigate the mystery of the Ark of the Covenant.',
+      learn: ['Observing carefully and spotting clues', 'What is known about the Ark of the Covenant', 'Asking thoughtful questions and checking claims', 'Drawing conclusions from the evidence'],
+      climb: [['C', 'Character: honesty and fairness when weighing evidence'], ['L', 'Leadership: the courage to share findings and work as a team'], ['I', 'Independent thinking: questioning claims and testing what is true'], ['M', 'Mastery of life skills: careful observation, listening and reasoning'], ['B', 'Building impact: using truth to help and encourage others']],
+      faith: 'Taught from a Christian worldview: children learn that God is the source of all truth, and how to seek it carefully, wisely and with an open Bible. Everyone is welcome.',
+      verse: { text: '“Prove all things; hold fast that which is good.”', ref: '1 Thessalonians 5:21 (KJV)' },
       squareUrl: '' },
     { slug: 'intro-entrepreneurship', name: 'LLA Intro to Entrepreneurship', ref: 'LLA Intro to', time: '12–2 pm', ages: '13–18', fw: 'CV',
       mentor: 'Jennifer Rees', creds: 'Financial Advisor · Education Assistant · LLA Chief Programs Officer',
@@ -149,7 +153,7 @@
       '<div class="reg-mentor"><span class="reg-mentor__label">Your Mentor</span><span class="reg-mentor__name">' + esc(c.mentor) + '</span><span class="reg-mentor__creds">' + esc(c.creds) + '</span></div>' +
       '<div class="reg-details">' +
         '<p><strong>When:</strong> Fridays ' + esc(c.time) + ', Jan 8 – Feb 26, 2027 (8 weeks)</p>' +
-        '<p><strong>Where:</strong> LLA Langley Campus (address emailed after registration)</p>' +
+        '<p><strong>Where:</strong> LLA Langley Learning Centre (address emailed after registration)</p>' +
         '<p><strong>Class size:</strong> 10–15 students' + spotsText(c, ' · ') + '</p>' +
       '</div>' +
       '<div class="reg-foot"><p><span class="reg-price" style="font-size:30px">' + PRICE + '</span> <span class="reg-note">per child, plus applicable tax</span></p>' +
@@ -228,7 +232,7 @@
               '<li><strong>Send ' + PRICE + '</strong> by Interac e-Transfer to <strong>' + esc(ETRANSFER_EMAIL) + '</strong></li>' +
               '<li>In the e-Transfer message, write the <strong>first three words of the course name</strong> and your child\'s first name:' +
                 '<div class="reg-msg"><span data-msg>' + esc(payMessage()) + '</span><button type="button" class="reg-copy" data-copy>Copy</button></div></li>' +
-              '<li>Once your e-Transfer arrives, we\'ll email you a thank-you with the campus address and a short child information form.</li>' +
+              '<li>Once your e-Transfer arrives, we\'ll email you a thank-you with the Learning Centre address and a short child information form.</li>' +
             '</ol>' +
             '<p class="reg-warn"><strong>Your spot is held for 12 hours.</strong> If your e-Transfer hasn\'t arrived by then, the spot is released to the next family.</p>' +
             '<button type="button" class="btn btn--gold" data-go="thanks">I\'ve Sent My e-Transfer <span aria-hidden="true">→</span></button>' +
@@ -262,7 +266,7 @@
     return '<div class="reg-body">' +
       '<div class="reg-thanks"><p class="eyebrow" style="margin:0 0 8px">Thank You</p>' +
         '<h3>You\'re registered for ' + esc(c.name) + '!</h3>' +
-        '<p style="color:var(--muted)">We\'re so excited! Once your payment arrives, we\'ll email a thank-you with the Langley Campus address and everything you need for the first class. We can\'t wait to meet ' + esc(childName() || 'your child') + '.</p></div>' +
+        '<p style="color:var(--muted)">We\'re so excited! Once your payment arrives, we\'ll email a thank-you with the Langley Learning Centre address and everything you need for the first class. We can\'t wait to meet ' + esc(childName() || 'your child') + '.</p></div>' +
       '<div style="padding-top:14px;border-top:1px solid #eee7da"><p class="reg-label">Register for another course</p><div class="reg-others">' +
         others.map(function (o) {
           return '<button type="button" class="reg-other" data-open="' + o.slug + '"><span>' + esc(o.name) + ' <small>· Ages ' + esc(o.ages) + ' · ' + esc(o.time) + '</small></span><em>Add →</em></button>';
