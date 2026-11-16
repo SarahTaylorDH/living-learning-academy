@@ -145,3 +145,8 @@ body.reg-lock { overflow: hidden; }
 .reg-faith { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--ivory); border-left: 3px solid var(--gold); font: italic 400 15.5px/1.5 var(--serif); color: var(--navy); }
 .reg-verse { font-style: normal; }
 .reg-verse cite { display: block; margin-top: 2px; font: 700 11px/1.4 var(--sans); font-style: normal; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dark); }
+/* Series lines under a course name (tagline + current adventure) */
+.reg-tagline { display: block; margin-top: 4px; font: 700 12px/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dark); }
+.reg-episode { display: block; margin: 2px 0 4px; font: italic 400 16px/1.35 var(--serif); color: var(--navy); }
+.reg-dialog__head .reg-tagline { margin-top: 6px; }
+.reg-dialog__head .reg-episode { font-size: 18px; }
