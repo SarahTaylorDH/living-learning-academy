@@ -14,7 +14,7 @@
   // Square checkout links: paste each course's link between the quotes.
   var COURSES = [
     { slug: 'music-theatre', name: 'LLA Music Theatre & Character', ref: 'LLA Music Theatre', time: '9–11 am', ages: '12–18', fw: 'CW',
-      mentor: 'Natalia Pardalis', creds: 'Jazz Vocalist · Music Educator · Owner, Pardalis Music School',
+      mentor: 'Natalia Pardalis', creds: 'Award-Winning Jazz Vocalist · Music Educator · Owner, Pardalis Studio of Music',
       blurb: 'Build creative skills, stage confidence and teamwork through music and performance.',
       learn: ['Singing and healthy vocal technique', 'Stage presence and acting basics', 'Rehearsing and performing as an ensemble'],
       squareUrl: '' },
