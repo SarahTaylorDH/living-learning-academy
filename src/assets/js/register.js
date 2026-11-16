@@ -148,7 +148,7 @@
       (c.faith ? '<div class="reg-faith"><p>' + esc(c.faith) + '</p>' + (c.verse ? '<p class="reg-verse">' + esc(c.verse.text) + ' <cite>' + esc(c.verse.ref) + '</cite></p>' : '') + '</div>' : '') +
       '<div class="reg-mentor"><span class="reg-mentor__label">Your Mentor</span><span class="reg-mentor__name">' + esc(c.mentor) + '</span><span class="reg-mentor__creds">' + esc(c.creds) + '</span></div>' +
       '<div class="reg-details">' +
-        '<p><strong>When:</strong> Fridays ' + esc(c.time) + ', Jan 8 – Feb 19, 2027</p>' +
+        '<p><strong>When:</strong> Fridays ' + esc(c.time) + ', Jan 8 – Feb 26, 2027 (8 weeks)</p>' +
         '<p><strong>Where:</strong> LLA Langley Campus (address emailed after registration)</p>' +
         '<p><strong>Class size:</strong> 10–15 students' + spotsText(c, ' · ') + '</p>' +
       '</div>' +
