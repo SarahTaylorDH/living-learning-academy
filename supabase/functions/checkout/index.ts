@@ -114,6 +114,23 @@ Deno.serve(async (req) => {
   try { p = await req.json(); } catch { return reply({ error: 'invalid' }, 400); }
   if (p.website) return reply({ ok: true });  // spam bot filled the hidden field
 
+  // Safety net (called every 10 minutes by the database): ask Square whether unpaid card orders were paid.
+  if (p.action === 'sync') {
+    const rows = (await db('orders_to_sync', {})) as { id: string; square_order_id: string }[];
+    let paid = 0;
+    for (const row of rows || []) {
+      try {
+        const o = (await sq(`/orders/${row.square_order_id}`)).order || {};
+        const tenders = (o.tenders || []) as { id: string; payment_id?: string }[];
+        const due = o.net_amount_due_money ? o.net_amount_due_money.amount : null;
+        if (o.state === 'COMPLETED' || (tenders.length && due === 0)) {
+          if (await db('order_paid_from_square', { p_order: row.id, p_payment_ids: tenders.map((t) => t.payment_id || t.id) })) paid++;
+        }
+      } catch (e) { console.error('sync', row.id, String(e)); }
+    }
+    return reply({ checked: (rows || []).length, paid });
+  }
+
   // 1. Save the order (database checks everything and decides prices).
   let order: Record<string, any>;
   try {
