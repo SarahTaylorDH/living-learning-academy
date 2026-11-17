@@ -150,3 +150,29 @@ body.reg-lock { overflow: hidden; }
 .reg-episode { display: block; margin: 2px 0 4px; font: italic 400 16px/1.35 var(--serif); color: var(--navy); }
 .reg-dialog__head .reg-tagline { margin-top: 6px; }
 .reg-dialog__head .reg-episode { font-size: 18px; }
+
+/* Pricing (cards + pop-up) and the "Ways to save" box */
+.reg-price__alt { display: block; margin-top: 6px; font-size: 12.5px !important; }
+.reg-cost { display: flex; flex-direction: column; gap: 4px; }
+.reg-cost p { margin: 0; }
+.reg-save { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; color: #dcdff0; font-size: 15.5px; }
+.reg-save strong { color: #fff; }
+
+/* Payment choices (form) and payment step: simple, blue highlights */
+.reg-paybox { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #f2f5fb; border-left: 3px solid var(--navy); }
+.reg-label__note { margin-left: 6px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+.reg-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reg-seg__opt { display: flex; gap: 10px; align-items: center; padding: 12px 14px; background: #fff; border: 1px solid #cdd6e6; border-radius: var(--radius); cursor: pointer; }
+.reg-seg__opt input { width: 18px; height: 18px; margin: 0; accent-color: var(--navy); flex-shrink: 0; }
+.reg-seg__opt b { display: block; font: 400 18px/1.2 var(--serif); color: var(--navy); }
+.reg-seg__opt small { display: block; margin-top: 3px; font-size: 12.5px; color: var(--muted); }
+.reg-seg__opt.is-on { padding: 11px 13px; border: 2px solid var(--navy); background: #e8eef9; }
+.reg-pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--navy); color: #fff; font: 700 10px/1.6 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+.reg-hint { color: var(--navy); }
+.reg-hint:empty { display: none; }
+.reg-paycard { display: flex; flex-direction: column; gap: 12px; padding: 18px; background: #f2f5fb; border-left: 3px solid var(--navy); }
+.reg-kv { display: grid; gap: 8px; }
+.reg-kv p { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; background: #fff; border: 1px solid #dbe3f0; }
+.reg-kv span { min-width: 76px; font: 700 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.reg-kv strong { font-size: 16px; color: var(--navy); overflow-wrap: anywhere; }
+@media (max-width: 480px) { .reg-seg { grid-template-columns: 1fr; } }
