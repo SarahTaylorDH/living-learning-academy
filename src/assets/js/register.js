@@ -15,7 +15,7 @@
   var COURSES = [
     { slug: 'music-theatre', name: 'LLA Music Theatre & Character', ref: 'LLA Music Theatre', time: '9–11 am', ages: '12–18', fw: 'CW',
       mentor: 'Natalia Pardalis', creds: 'Award-Winning Jazz Vocalist · Music Educator · Owner, Pardalis Studio of Music',
-      hook: 'Give your teen the confidence to step onto a stage, and into any room.',
+      hook: 'Where teens build the confidence to perform, and carry it into any room.',
       blurb: 'Teens learn to sing, act and bring a character to life, then perform a musical number together.',
       learn: ['Basic singing technique and healthy vocal habits', 'Common theatre terms and stage skills', 'Bringing a character to life through song and acting', 'Performing a musical number together, with choreography, spoken lines and possible solos'],
       climb: [['C', 'Character: discipline, encouragement and grace in rehearsal'], ['L', 'Leadership: the courage to perform and lift up the ensemble'], ['I', 'Independent thinking: interpreting a character and story'], ['M', 'Mastery of life skills: confident speaking, teamwork and focus'], ['B', 'Building impact: a performance that blesses its audience']],
@@ -42,10 +42,15 @@
       blurb: 'Kids turn their own ideas into a small business, with honesty and hard work at the core.',
       learn: ['Earning, saving, giving and spending wisely', 'Turning an idea into a product', 'Selling with honesty and good service'],
       squareUrl: '' },
-    { slug: 'critical-thinking-debate', name: 'LLA Critical Thinking & Debate', ref: 'LLA Critical Thinking', time: '3:30–5:30 pm', ages: '12–18', fw: 'CV',
+    { slug: 'critical-thinking-debate', name: 'LLA Spot the Spin', ref: 'LLA Spot the Spin', time: '3:30–5:30 pm', ages: '12–18', fw: 'CV',
       mentor: 'Drea Humphrey', creds: 'Investigative Journalist · Documentarian · LLA Founder',
-      blurb: 'Teens learn to think clearly, test ideas and make their case with confidence and respect.',
-      learn: ['Logic and spotting faulty reasoning', 'Building and defending an argument', 'Public speaking with confidence'],
+      tagline: 'Critical Thinking & Debate for Teens',
+      hook: 'Beyond the headlines and the social media spin: teens learn to find what’s true, and stand firm in it.',
+      blurb: 'Led by investigative journalist Drea Humphrey, teens learn to investigate claims, check sources, recognize bias and build arguments using evidence.',
+      learn: ['Investigating claims and checking sources', 'Recognizing bias and spin in the news and media', 'Building strong arguments from evidence', 'Debating, responding to opposing views and presenting with confidence'],
+      climb: [['C', 'Character: discernment, and standing firm in their values'], ['L', 'Leadership: speaking with confidence, even when it means standing apart from the crowd'], ['I', 'Independent thinking: resisting peer and mainstream pressure'], ['M', 'Mastery of life skills: research, reasoning, debate and public speaking'], ['B', 'Building impact: engaging differing opinions respectfully, without taking offence']],
+      faith: 'Taught in line with LLA’s core values: youth learn to practice discernment, consider differing opinions respectfully without taking offence, and stand firm in their values, even when it means standing apart from the crowd.',
+      verse: { text: '“If you look for truth, you may find comfort in the end: if you look for comfort you will not get either comfort or truth.”', ref: 'C. S. Lewis' },
       squareUrl: '' }
   ];
   var STEPS = ['details', 'form', 'pay', 'thanks'];
