@@ -55,7 +55,7 @@
       climb: [['C', 'Character: honesty with customers and pride in good work'], ['L', 'Leadership: owning a project from first idea to launch'], ['I', 'Independent thinking: solving problems and making their own business decisions'], ['M', 'Mastery of life skills: budgeting, pricing, marketing and customer service'], ['B', 'Building impact: offering something of real value to their community']],
       faith: 'Taught in line with LLA’s core values: students learn to work hard, overcome challenges, deal honestly and manage money wisely, and discover how they can make a real difference in people’s lives through service.',
       verse: { text: '“Well done is better than well said.”', ref: 'Benjamin Franklin' } },
-    { slug: 'kidpreneurs', name: 'LLA Kidpreneurs', ref: 'Kidpreneurs', time: '3–5 pm', ages: '8–12', fw: 'CW', max: 20, dates: DATES_MAR12,
+    { slug: 'kidpreneurs', name: 'LLA Kidpreneurs', ref: 'Kidpreneurs', time: '3:30–5:30 pm', ages: '8–11', fw: 'CW', max: 20, dates: DATES_MAR12,
       mentor: 'Jennifer Rees', creds: 'Entrepreneur · Financial Advisor · Education Assistant · LLA Chief Programs Officer',
       tagline: 'Business & Money Skills for Kids',
       hook: 'Kids turn their own idea into a real little business, then open shop on Market Day.',
