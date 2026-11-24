@@ -86,7 +86,7 @@ alter table public.submission_children
 -- ---------------------------------------------------------------- rules (named, so they can be updated later)
 do $$
 declare
-  interest_list text := $l$array['critical-thinking-debate','finance-entrepreneurship','public-speaking','impact-community','faith-freedom','culture-identity','civics-citizenship','creative-arts-media','survival-nature','farming-food','build-serve','self-defence','music-dance','dance-character','film-television','journalism-media','beauty-character','etiquette-character','fitness-character','other']$l$;
+  interest_list text := $l$array['critical-thinking-debate','finance-entrepreneurship','public-speaking','impact-community','faith-freedom','culture-identity','civics-citizenship','creative-arts-media','survival-nature','farming-food','build-serve','self-defence','music-dance','dance-character','film-television','journalism-media','beauty-character','etiquette-character','firearm-safety','fitness-character','other']$l$;
   rules text[][] := array[
     -- [table, constraint name, check expression]
     ['submissions','form_type_allowed',        $c$form_type in ('parent','mentor','community','volunteer','course_request')$c$],
