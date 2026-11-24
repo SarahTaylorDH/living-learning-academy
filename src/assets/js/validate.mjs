@@ -200,7 +200,7 @@ export function validateSubmission(formType, input) {
 }
 
 // ------------------------------------------------------------------ parent / student survey (its own table: survey_responses)
-export const SURVEY_RESPONDENTS = { parent: 'A parent or guardian', student: 'A student' };
+export const SURVEY_RESPONDENTS = { parent: 'A parent or guardian', student: 'A learner' };
 export const SURVEY_FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Day camps' };
 export const SURVEY_BUDGETS = { 'under-150': 'Under $150', '150-250': '$150 to $250', '250-350': '$250 to $350', '350-plus': '$350 or more', unsure: 'Not sure yet' };
 export const SURVEY_HEARD = { friend: 'A friend or family member', church: 'Church or ministry', social: 'Social media', search: 'Online search', school: 'School or co-op', event: 'An event', other: 'Somewhere else' };
