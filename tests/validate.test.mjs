@@ -120,7 +120,7 @@ test('there is a confirmation email for every form', () => {
 
 test('course and program lists are complete', () => {
   assert.equal(Object.keys(COURSES).length, 8);
-  assert.equal(Object.keys(PROGRAMS).length, 8);
+  assert.equal(Object.keys(PROGRAMS).length, 11);
   for (const p of Object.values(PROGRAMS)) assert.ok(p.labels.every((l) => ['CW', 'CV'].includes(l)));
 });
 
