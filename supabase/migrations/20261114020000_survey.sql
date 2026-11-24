@@ -29,7 +29,7 @@ create table if not exists public.survey_responses (
   constraint survey_schooling_allowed check (schooling <@ array['public','homeschool','private','alternative']),
   constraint survey_formats_allowed check (formats <@ array['in-person','online','hands-on']),
   constraint survey_days_allowed check (days <@ array['weekdays','evenings','weekends','occasional']),
-  constraint survey_topics_allowed check (topics <@ array['critical-thinking-debate','finance-entrepreneurship','public-speaking','impact-community','faith-freedom','culture-identity','civics-citizenship','creative-arts-media','survival-nature','farming-food','build-serve','self-defence','music-dance','beauty-character','etiquette-character','fitness-character'])
+  constraint survey_topics_allowed check (topics <@ array['critical-thinking-debate','finance-entrepreneurship','public-speaking','impact-community','faith-freedom','culture-identity','civics-citizenship','creative-arts-media','survival-nature','farming-food','build-serve','self-defence','music-dance','dance-character','film-television','journalism-media','beauty-character','etiquette-character','fitness-character'])
 );
 
 alter table public.survey_responses enable row level security;
