@@ -333,7 +333,7 @@
           '<span class="reg-note" style="display:block;margin-top:6px">Tell us the family who told you about LLA. They get $20 off, and we\'ll try to connect your children with families you know.</span></div>') +
       '<div class="reg-hp" aria-hidden="true"><label for="reg-website">Leave this empty</label><input id="reg-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>' +
       (state.policy_ack ? '' :
-        '<label class="reg-check"><input type="checkbox" name="policy_ack"' + (state.errors.policy_ack ? ' aria-invalid="true"' : '') + '> <span>I understand each course needs 10 students to run, and I\'ll get a full refund or transfer if it doesn\'t.</span></label>' +
+        '<label class="reg-check"><input type="checkbox" name="policy_ack"' + (state.errors.policy_ack ? ' aria-invalid="true"' : '') + '> <span>I understand that each course needs 8–10 students to run, and I\'ll get a full refund or transfer if it doesn\'t.</span></label>' +
         (state.errors.policy_ack ? '<span class="reg-err">' + esc(state.errors.policy_ack) + '</span>' : '')) +
       '<p class="reg-note">Please don\'t include health information here. We\'ll send a secure child information form after you register.</p>' +
       '<div class="reg-foot"><button type="button" class="reg-link" data-go="details">← Back</button>' +
