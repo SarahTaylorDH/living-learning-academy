@@ -35,7 +35,7 @@
       blurb: 'Led by award-winning jazz vocalist, music educator and Pardalis Studio of Music owner Natalia Pardalis, teens learn to sing, act and bring a character to life, then perform a musical number together.',
       learn: ['Basic singing technique and healthy vocal habits', 'Common theatre terms and stage skills', 'Bringing a character to life through song and acting', 'Performing a musical number together for the class and parents, with choreography, spoken lines and possible solos'],
       climb: [['C', 'Character: discipline, encouragement and grace in rehearsal'], ['L', 'Leadership: the courage to perform and lift up the ensemble'], ['I', 'Independent thinking: interpreting a character and story'], ['M', 'Mastery of life skills: confident speaking, teamwork and focus'], ['B', 'Building impact: a performance that blesses its audience']],
-      faith: 'Taught from a Christian worldview, with Scripture woven into every class: students are reminded that their gifts and talents come from God, and learn to use them to glorify Him and bless those around them. Everyone is welcome.',
+      faith: 'Taught from a Christian worldview, with Scripture woven into every class: learners are reminded that their gifts and talents come from God, and learn to use them to glorify Him and bless those around them. Everyone is welcome.',
       verse: { text: '“Worship the Lord with gladness; come before him with joyful songs.”', ref: 'Psalm 100:2 (NIV)' } },
     { slug: 'truth-hunters', name: 'LLA Jr. Truth Detectives', ref: 'Truth Detectives', time: '12–2 pm', ages: '6–11', fw: 'CW', max: 16, dates: DATES_MAR12,
       mentor: 'Drea Humphrey', creds: 'Investigative Journalist · Documentarian · LLA Founder',
@@ -53,7 +53,7 @@
       blurb: 'Led by entrepreneur, financial advisor, educator and LLA Chief Programs Officer Jennifer Rees, teens take their own idea, from baking and artwork to woodworking or a service, and build it into a small business in 8 weeks. An intro-level course: no business experience needed.',
       learn: ['Naming and branding their business', 'Costs, pricing, budgeting and profit', 'Building a simple website and marketing it safely', 'Presenting and launching their business to the class and parents'],
       climb: [['C', 'Character: honesty with customers and pride in good work'], ['L', 'Leadership: owning a project from first idea to launch'], ['I', 'Independent thinking: solving problems and making their own business decisions'], ['M', 'Mastery of life skills: budgeting, pricing, marketing and customer service'], ['B', 'Building impact: offering something of real value to their community']],
-      faith: 'Taught in line with LLA’s core values: students learn to work hard, overcome challenges, deal honestly and manage money wisely, and discover how they can make a real difference in people’s lives through service.',
+      faith: 'Taught in line with LLA’s core values: learners learn to work hard, overcome challenges, deal honestly and manage money wisely, and discover how they can make a real difference in people’s lives through service.',
       verse: { text: '“Well done is better than well said.”', ref: 'Benjamin Franklin' } },
     { slug: 'kidpreneurs', name: 'LLA Kidpreneurs', ref: 'Kidpreneurs', time: '3:30–5:30 pm', ages: '8–11', fw: 'CW', max: 20, dates: DATES_MAR12,
       mentor: 'Jennifer Rees', creds: 'Entrepreneur · Financial Advisor · Education Assistant · LLA Chief Programs Officer',
@@ -289,7 +289,7 @@
       '<div class="reg-details">' +
         '<p><strong>When:</strong> ' + esc(whenOf(c)) + '</p>' +
         '<p><strong>Where:</strong> ' + esc(placeOf(c)) + ' (address emailed once you\'ve paid)</p>' +
-        '<p><strong>Class size:</strong> 10–' + c.max + ' students' + spotsText(c, ' · ') + '</p>' +
+        '<p><strong>Class size:</strong> 8–' + c.max + ' learners' + spotsText(c, ' · ') + '</p>' +
       '</div>' +
       '<div class="reg-foot"><div class="reg-cost"><p><span class="reg-price" style="font-size:30px">' + money(MONTHLY) + '<small>/month for ' + MONTHS + ' months</small></span></p>' +
         '<p class="reg-note">Pay monthly, or pay in full</p>' +
@@ -364,7 +364,7 @@
           '<span class="reg-note" style="display:block;margin-top:6px">Tell us the family who told you about LLA. They get $20 off, and we\'ll try to connect your children with families you know.</span></div>') +
       '<div class="reg-hp" aria-hidden="true"><label for="reg-website">Leave this empty</label><input id="reg-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>' +
       (state.policy_ack ? '' :
-        '<label class="reg-check"><input type="checkbox" name="policy_ack"' + (state.errors.policy_ack ? ' aria-invalid="true"' : '') + '> <span>I understand that each course needs 8–10 students to run, and I\'ll get a full refund or transfer if it doesn\'t.</span></label>' +
+        '<label class="reg-check"><input type="checkbox" name="policy_ack"' + (state.errors.policy_ack ? ' aria-invalid="true"' : '') + '> <span>I understand that each course needs 8–10 learners to run, and I\'ll get a full refund or transfer if it doesn\'t.</span></label>' +
         (state.errors.policy_ack ? '<span class="reg-err">' + esc(state.errors.policy_ack) + '</span>' : '')) +
       '<p class="reg-note">Please don\'t include health information here. We\'ll send a secure child information form after you register.</p>' +
       '<div class="reg-foot"><button type="button" class="reg-link" data-go="details">← Back</button>' +
