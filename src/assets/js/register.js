@@ -88,7 +88,7 @@
   // family: parent details (entered once). items: [{ course: slug, child: {first, last, age, gender} }].
   var state = {
     course: null, step: 'details', errors: {}, busy: false, opener: null, notice: '',
-    family: { province: 'BC' }, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '',
+    family: { province: 'BC' }, kidEdit: {}, familyBefore: null, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '',
     plan: '', method: '', etransfer_from: '', householdPrior: false, householdKey: '',
     code: '', codePercent: 0, codeNotice: '', codeError: '',
     result: null, bot: false
@@ -271,7 +271,7 @@
     var steps = idx < 0 ? '' : '<ol class="reg-steps" aria-label="Step ' + (idx + 1) + ' of 4">' + STEPS.map(function (s, i) { return '<li class="' + (i <= idx ? 'on' : '') + '"></li>'; }).join('') + '</ol>';
     var title = (state.step === 'details' || state.step === 'form' || state.step === 'full') && c
       ? '<p class="reg-dialog__tags">' + tag(c) + '<span class="reg-when">Fridays · ' + esc(c.time) + ' · Ages ' + esc(c.ages) + '</span></p><h2 id="reg-title">' + esc(c.name) + '</h2>' + subtitle(c)
-      : '<h2 id="reg-title">' + ({ cart: 'Your Registration', pick: 'Add a Course', pay: 'Payment', thanks: 'Thank You', paid: 'Thank You' }[state.step] || 'Register') + '</h2>';
+      : '<h2 id="reg-title">' + ({ cart: 'Your Registration', edit: 'Your Details', pick: 'Add a Course', pay: 'Payment', thanks: 'Thank You', paid: 'Thank You' }[state.step] || 'Register') + '</h2>';
     return '<div class="reg-dialog__head"><div>' + title + '</div>' +
       '<button type="button" class="reg-x" data-close aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       steps;
@@ -389,7 +389,76 @@
       (list.length ? codeBox() : '') +
       '<div class="reg-foot"><button type="button" class="btn btn--outline" data-go="pick">+ Add another course</button>' +
         (list.length ? '<button type="button" class="btn btn--gold" data-go="pay">Continue to Payment <span aria-hidden="true">→</span></button>' : '') + '</div>' +
+      (list.length ? '<p><button type="button" class="reg-link" data-go="edit">← Back to edit your details</button></p>' : '') +
       '</div>';
+  }
+
+  // "← Back" from the cart: everything the family typed, ready to correct.
+  function viewEdit() {
+    var list = kids();
+    return '<form class="reg-body" data-edit-form novalidate>' +
+      '<p class="reg-note">Change anything that isn\'t right, then save.</p>' +
+      '<h3>Parent or guardian</h3><div class="reg-fields">' +
+        field('family', 'parent_name', 'Full name', 'text', ' autocomplete="name" required') +
+        field('family', 'email', 'Email', 'email', ' autocomplete="email" required') +
+        field('family', 'phone', 'Cell phone', 'tel', ' autocomplete="tel" required') +
+        field('family', 'street_address', 'Street address', 'text', ' autocomplete="street-address" required') +
+        field('family', 'city', 'City', 'text', ' autocomplete="address-level2" required') +
+        field('family', 'province', 'Province', 'text', ' autocomplete="address-level1" required') +
+        field('family', 'postal_code', 'Postal code', 'text', ' autocomplete="postal-code" required') +
+      '</div>' +
+      list.map(function (k, i) {
+        var g = state.kidEdit['kid' + i + '_gender'];
+        var opt = function (v, label) { return '<label class="reg-check" style="align-items:center"><input type="radio" name="kid' + i + '_gender" value="' + v + '"' + (g === v ? ' checked' : '') + '> <span>' + label + '</span></label>'; };
+        return '<h3>' + (list.length > 1 ? 'Child ' + (i + 1) : 'Your child') + '</h3><div class="reg-fields">' +
+          field('kidEdit', 'kid' + i + '_first', 'First name', 'text', ' required') +
+          field('kidEdit', 'kid' + i + '_last', 'Last name', 'text', ' required') +
+          field('kidEdit', 'kid' + i + '_age', 'Age', 'number', ' min="5" max="18" inputmode="numeric" required') +
+          '<fieldset style="border:0;margin:0;padding:0"><legend style="font:700 12px/1.4 var(--sans);letter-spacing:.06em;color:var(--navy);margin:0 0 10px;padding:0">Gender</legend>' +
+            '<div style="display:flex;gap:22px">' + opt('male', 'Male') + opt('female', 'Female') + '</div></fieldset>' +
+        '</div>';
+      }).join('') +
+      '<div class="reg-foot"><button type="button" class="reg-link" data-go="pick">← Back to courses</button>' +
+      '<button type="submit" class="btn btn--gold"' + (state.busy ? ' disabled aria-busy="true"' : '') + '>Save &amp; Continue <span aria-hidden="true">→</span></button></div>' +
+      '</form>';
+  }
+  function startEdit() {
+    state.kidEdit = {}; state.familyBefore = {};
+    FAMILY_FIELDS.forEach(function (n) { state.familyBefore[n] = state.family[n]; });
+    kids().forEach(function (k, i) {
+      state.kidEdit['kid' + i + '_first'] = k.first; state.kidEdit['kid' + i + '_last'] = k.last;
+      state.kidEdit['kid' + i + '_age'] = k.age; state.kidEdit['kid' + i + '_gender'] = k.gender;
+    });
+  }
+  function saveEdit(form) {
+    var e = {}, ed = state.kidEdit, list = kids(), names = {};
+    FAMILY_FIELDS.forEach(function (n) { state.family[n] = form.elements[n].value.trim(); });
+    list.forEach(function (k, i) {
+      ['first', 'last', 'age'].forEach(function (n) { ed['kid' + i + '_' + n] = form.elements['kid' + i + '_' + n].value.trim(); });
+      var g = form.querySelector('input[name="kid' + i + '_gender"]:checked');
+      if (g) ed['kid' + i + '_gender'] = g.value;
+    });
+    validateFamily(e);
+    list.forEach(function (k, i) {
+      var first = ed['kid' + i + '_first'], last = ed['kid' + i + '_last'], age = parseInt(ed['kid' + i + '_age'], 10);
+      var key = (first + '|' + last).toLowerCase();
+      if (!first) e['kid' + i + '_first'] = 'Please enter your child\'s first name.';
+      else if (names[key]) e['kid' + i + '_first'] = 'Two children have the same name.';
+      if (!last) e['kid' + i + '_last'] = 'Please enter your child\'s last name.';
+      if (!(age >= 5 && age <= 18)) e['kid' + i + '_age'] = 'Please enter an age from 5 to 18.';
+      names[key] = 1;
+    });
+    state.errors = e;
+    if (Object.keys(e).length) { render('[name="' + Object.keys(e)[0] + '"]'); return; }
+    var map = {};
+    list.forEach(function (k, i) {
+      map[(k.first + '|' + k.last).toLowerCase()] = { first: ed['kid' + i + '_first'], last: ed['kid' + i + '_last'], age: parseInt(ed['kid' + i + '_age'], 10), gender: ed['kid' + i + '_gender'] };
+    });
+    state.items.forEach(function (it) { it.child = map[(it.child.first + '|' + it.child.last).toLowerCase()]; });
+    state.familyBefore = null; state.etransfer_from = '';
+    persist();
+    state.busy = true; render();
+    checkHousehold().then(function () { state.busy = false; persist(); state.step = 'cart'; render(); });
   }
 
   function viewPick() {
@@ -494,7 +563,7 @@
   }
 
   function render(focusSelector) {
-    var views = { details: viewDetails, form: viewForm, cart: viewCart, pick: viewPick, pay: viewPay, thanks: viewThanks, paid: viewPaid, full: viewFull };
+    var views = { details: viewDetails, form: viewForm, cart: viewCart, edit: viewEdit, pick: viewPick, pay: viewPay, thanks: viewThanks, paid: viewPaid, full: viewFull };
     dialog.innerHTML = head() + views[state.step]();
     var target = focusSelector && dialog.querySelector(focusSelector);
     (target || dialog).focus();
@@ -523,6 +592,8 @@
     render();
   }
   function close() {
+    if (state.familyBefore) { state.family = state.familyBefore; state.familyBefore = null; }
+    if (state.step === 'edit') state.step = 'cart';
     overlay.hidden = true;
     document.body.classList.remove('reg-lock');
     state.course = null;
@@ -535,6 +606,8 @@
   function go(step) {
     state.errors = {}; if (step !== 'cart' && step !== 'pay') state.notice = '';
     if (step === 'form') { state.child = {}; state.childPick = ''; state.editFamily = false; }
+    if (state.step === 'edit' && state.familyBefore) { state.family = state.familyBefore; state.familyBefore = null; }   // left without saving
+    if (step === 'edit') startEdit();
     state.step = step;
     render(step === 'form' ? 'input:not([type=hidden]):not([tabindex="-1"])' : null);
   }
@@ -548,8 +621,8 @@
     if (form.elements.referred_by) state.referred_by = form.elements.referred_by.value.trim();
     if (form.elements.policy_ack) state.policy_ack = form.elements.policy_ack.checked;
   }
-  function validate() {
-    var f = state.family, ch = state.child, e = {};
+  function validateFamily(e) {
+    var f = state.family;
     if (!f.parent_name) e.parent_name = 'Please enter your full name.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email || '')) e.email = 'Please enter a valid email.';
     if ((f.phone || '').replace(/\D/g, '').length < 10) e.phone = 'Please enter a 10-digit phone number.';
@@ -557,6 +630,10 @@
     if (!f.city) e.city = 'Please enter your city.';
     if (!f.province) e.province = 'Please enter your province.';
     if (!/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(f.postal_code || '')) e.postal_code = 'Please enter a postal code like V1M 0B2.';
+  }
+  function validate() {
+    var ch = state.child, e = {};
+    validateFamily(e);
     if (Object.keys(e).length) state.editFamily = true;
     var known = kids();
     if (known.length && !state.childPick) { e.child_pick = 'Please choose which child this course is for.'; return e; }
@@ -699,6 +776,8 @@
   dialog.addEventListener('submit', function (e) {
     var form = e.target.closest('[data-reg-form]');
     if (form) { e.preventDefault(); if (!state.busy) submit(form); }
+    var ef = e.target.closest('[data-edit-form]');
+    if (ef) { e.preventDefault(); if (!state.busy) saveEdit(ef); }
   });
   document.addEventListener('keydown', function (e) {
     if (overlay.hidden) return;
