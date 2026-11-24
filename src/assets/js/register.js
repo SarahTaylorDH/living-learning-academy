@@ -88,9 +88,9 @@
   // family: parent details (entered once). items: [{ course: slug, child: {first, last, age, gender} }].
   var state = {
     course: null, step: 'details', errors: {}, busy: false, opener: null, notice: '',
-    family: { province: 'BC' }, confirm: { email2: '' }, kidEdit: {}, familyBefore: null, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '',
+    family: { province: 'BC' }, confirm: { email2: '' }, kidEdit: {}, familyBefore: null, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '', referrer_email: '',
     plan: '', method: '', etransfer_from: '', householdPrior: false, householdKey: '',
-    code: '', codePercent: 0, codeNotice: '', codeError: '',
+    code: '', codePercent: 0, codeCents: 0, codeNotice: '', codeError: '',
     result: null, bot: false
   };
   var openedAt = Date.now();
@@ -117,10 +117,11 @@
     var used = false;
     return state.items.map(function (it, i) {
       var pct = state.householdPrior || i > 0 ? 10 : 0, c = find(it.course), p = c.price || PRICE, m = c.monthly || MONTHLY;
-      var byCode = !used && state.code && state.codePercent > pct;
-      if (byCode) { used = true; pct = state.codePercent; }
-      return { item: it, course: c, discount: pct > 0 && !byCode, byCode: byCode, pct: pct,
-        full: Math.round(p * (100 - pct) / 100), monthly: Math.round(m * (100 - pct) / 100) };
+      var byCode = !used && state.code && (state.codeCents || state.codePercent > pct), cents = 0;
+      if (byCode) { used = true; if (state.codeCents) cents = state.codeCents; else pct = state.codePercent; }
+      var full = Math.round(p * (100 - pct) / 100), monthly = Math.round(m * (100 - pct) / 100);
+      if (cents) { full = Math.max(full - cents, 100); monthly = Math.max(monthly - Math.round(cents / MONTHS), 100); }   // $ coupon: on top of the family discount
+      return { item: it, course: c, discount: pct > 0 && (!byCode || cents > 0), byCode: byCode, cents: cents, pct: pct, full: full, monthly: monthly };
     });
   }
   function totals() {
@@ -133,7 +134,7 @@
   function persist() {
     try {
       localStorage.setItem(CART_KEY, JSON.stringify({ term: TERM, family: state.family, items: state.items,
-        policy_ack: state.policy_ack, referred_by: state.referred_by, householdPrior: state.householdPrior, householdKey: state.householdKey }));
+        policy_ack: state.policy_ack, referred_by: state.referred_by, referrer_email: state.referrer_email, householdPrior: state.householdPrior, householdKey: state.householdKey }));
     } catch (e) {}
     renderBar();
   }
@@ -143,7 +144,7 @@
       if (!s || s.term !== TERM) return;
       state.family = s.family || state.family;
       state.items = (s.items || []).filter(function (it) { return find(it.course); });
-      state.policy_ack = !!s.policy_ack; state.referred_by = s.referred_by || '';
+      state.policy_ack = !!s.policy_ack; state.referred_by = s.referred_by || ''; state.referrer_email = s.referrer_email || '';
       state.householdPrior = !!s.householdPrior; state.householdKey = s.householdKey || '';
     } catch (e) {}
   }
@@ -196,9 +197,9 @@
       body: JSON.stringify({ p_code: code, p_email: state.family.email, p_phone: state.family.phone }) })
       .then(function (r) { if (!r.ok) throw new Error('code'); return r.json(); })
       .then(function (j) {
-        if (j.ok) { state.code = j.code; state.codePercent = j.percent; state.codeNotice = j.notice || ''; state.codeError = ''; return true; }
+        if (j.ok) { state.code = j.code; state.codePercent = j.percent || 0; state.codeCents = j.amount_cents || 0; state.codeNotice = j.notice || ''; state.codeError = ''; return true; }
         state.code = ''; state.codePercent = 0;
-        state.codeError = j.reason === 'used' ? 'This code is for a family\'s first registration, and your household has already registered.' : 'We don\'t recognize that code. Please check the spelling.';
+        state.codeError = j.reason === 'expired' ? 'This code has expired.' : j.reason === 'spent' ? 'This code has already been used.' : j.reason === 'used' ? 'This code is for a family\'s first registration, and your household has already registered.' : 'We don\'t recognize that code. Please check the spelling.';
         return false;
       });
   }
@@ -211,7 +212,7 @@
   }
   function codeNote() { return state.code && state.codeNotice ? '<p class="reg-warn"><strong>NOTE:</strong> ' + esc(state.codeNotice) + '</p>' : ''; }
   function codeBox() {
-    if (state.code) return '<p class="reg-note reg-hint">Code <strong>' + esc(state.code) + '</strong> applied: ' + state.codePercent + '% off one course. <button type="button" class="reg-link" data-code-remove>Remove</button></p>' + codeNote();
+    if (state.code) return '<p class="reg-note reg-hint">Code <strong>' + esc(state.code) + '</strong> applied: ' + (state.codeCents ? money(state.codeCents) : state.codePercent + '%') + ' off one course. <button type="button" class="reg-link" data-code-remove>Remove</button></p>' + codeNote();
     return '<div class="reg-fields" style="grid-template-columns:1fr auto;align-items:end"><div><label for="reg-discount_code">Discount code</label><input id="reg-discount_code" name="discount_code" type="text" maxlength="40" autocomplete="off" autocapitalize="characters"' + (state.codeError ? ' aria-invalid="true"' : '') + '></div>' +
       '<button type="button" class="btn btn--outline" data-code-apply>Apply</button></div>' + (state.codeError ? '<span class="reg-err" role="alert">' + esc(state.codeError) + '</span>' : '');
   }
@@ -390,9 +391,11 @@
           '</div>'
         : '') +
       (state.items.length ? '' :
-        '<div><label for="reg-referred_by">Who referred you? <span style="font-weight:400;color:var(--muted)">(optional)</span></label>' +
-          '<input id="reg-referred_by" name="referred_by" type="text" maxlength="120" value="' + esc(state.referred_by) + '">' +
-          '<span class="reg-note" style="display:block;margin-top:6px">Tell us the family who told you about LLA. They get $20 off, and we\'ll try to connect your children with families you know.</span></div>') +
+        '<div><p class="reg-label">Who referred you? <span style="font-weight:400">(optional)</span></p><div class="reg-fields">' +
+          '<div><label for="reg-referred_by">Their name</label><input id="reg-referred_by" name="referred_by" type="text" maxlength="120" value="' + esc(state.referred_by) + '"></div>' +
+          '<div><label for="reg-referrer_email">Their email</label><input id="reg-referrer_email" name="referrer_email" type="email" maxlength="200" autocomplete="off" value="' + esc(state.referrer_email) + '"' + (state.errors.referrer_email ? ' aria-invalid="true"' : '') + '>' +
+            (state.errors.referrer_email ? '<span class="reg-err">' + esc(state.errors.referrer_email) + '</span>' : '') + '</div></div>' +
+          '<span class="reg-note" style="display:block;margin-top:6px">Tell us the family who told you about LLA. If they\'ve registered with LLA, we\'ll email them a $20 coupon for their next course, and we\'ll try to connect your children with families you know.</span></div>') +
       '<div class="reg-hp" aria-hidden="true"><label for="reg-website">Leave this empty</label><input id="reg-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>' +
       (state.policy_ack ? '' :
         '<label class="reg-check"><input type="checkbox" name="policy_ack"' + (state.errors.policy_ack ? ' aria-invalid="true"' : '') + '> <span>I understand that each course needs 8–10 learners to run, and I\'ll get a full refund or transfer if it doesn\'t.</span></label>' +
@@ -411,7 +414,7 @@
       (list.length
         ? '<ul class="reg-cart">' + list.map(function (p, i) {
             return '<li><div><strong>' + esc(p.course.name) + '</strong><span>' + esc(p.item.child.first + ' ' + p.item.child.last) + ' · Fridays ' + esc(p.course.time) + '</span></div>' +
-              '<div class="reg-cart__price">' + money(p.monthly) + '<small>/month</small>' + (p.byCode ? '<em>' + p.pct + '% off with code</em>' : p.discount ? '<em>10% family discount</em>' : '') + '</div>' +
+              '<div class="reg-cart__price">' + money(p.monthly) + '<small>/month</small>' + (p.byCode ? '<em>' + (p.cents ? money(p.cents) + ' off course with code' : p.pct + '% off with code') + (p.discount ? ' + 10% family discount' : '') + '</em>' : p.discount ? '<em>10% family discount</em>' : '') + '</div>' +
               '<button type="button" class="reg-cart__x" data-remove="' + i + '" aria-label="Remove ' + esc(p.course.name + ' for ' + p.item.child.first) + '">×</button></li>';
           }).join('') + '</ul>' +
           '<p class="reg-cart__total"><span>Total</span><strong>' + money(t.monthly) + '<small>/month for ' + MONTHS + ' months</small></strong></p>' +
@@ -570,7 +573,7 @@
   }
 
   function closing() {
-    return '<p class="reg-note" style="text-align:center"><strong>Know a family who would love LLA?</strong> When they register and add your name, you get $20 off.</p>' +
+    return '<p class="reg-note" style="text-align:center"><strong>Know a family who would love LLA?</strong> You get $20 off your next course or program if they enter your name and email address in the referral box when they register for a course.</p>' +
       '<div class="reg-more"><a class="btn btn--outline" href="/donate/">Donate to LLA</a><button type="button" class="btn btn--outline" data-go="pick">Register Another Child</button></div>';
   }
 
@@ -587,7 +590,7 @@
           '<p><span>Amount</span><strong>' + money(r.total) + ' <small style="font-weight:400">for the full term' + (r.code ? ', with code ' + esc(r.code) : '') + (r.discount ? (r.code ? ' and' : ', with') + ' your family discount' : '') + '</small>' + '</strong></p>' +
           '<p><span>To</span><strong>' + esc(r.to || ETRANSFER_EMAIL) + '</strong></p>' +
           '<p><span>Message</span><strong>' + esc(r.message || '') + '</strong></p>' +
-        '</div><p class="reg-note">We\'ve emailed you these details too. Once your e-Transfer arrives, we\'ll email a thank-you with the address and everything you need for the first class.</p></div>' : '') +
+        '</div><p class="reg-note">We\'ve emailed you these details too. Once your e-Transfer arrives, we\'ll email a thank-you with the address. More details will follow before the first class.</p></div>' : '') +
       (names ? '<p style="text-align:center">Our mentors look forward to helping ' + esc(names) + ' build confidence, character and real-world skills!</p>' : '') +
       closing() +
       '</div>';
@@ -598,7 +601,7 @@
     return '<div class="reg-body">' +
       '<div class="reg-thanks"><p class="eyebrow" style="margin:0 0 8px">Thank You</p>' +
         '<h3>Your payment is complete!</h3>' +
-        '<p style="color:var(--muted)">You\'ll get a confirmation email in a few minutes with the address and everything you need for the first class. Our mentors look forward to meeting your family!</p></div>' +
+        '<p style="color:var(--muted)">You\'ll get a confirmation email in a few minutes with the address. More details will follow. Our skilled mentors look forward to meeting your family!</p></div>' +
       closing() +
       '</div>';
   }
@@ -661,6 +664,7 @@
     var g = form.querySelector('input[name="child_gender"]:checked');
     if (g) state.child.child_gender = g.value;
     if (form.elements.referred_by) state.referred_by = form.elements.referred_by.value.trim();
+    if (form.elements.referrer_email) state.referrer_email = form.elements.referrer_email.value.trim();
     if (form.elements.policy_ack) state.policy_ack = form.elements.policy_ack.checked;
   }
   function validateFamily(e, confirming) {
@@ -687,6 +691,11 @@
       var age = parseInt(ch.child_age, 10);
       if (!(age >= 5 && age <= 18)) e.child_age = 'Please enter an age from 5 to 18.';
       if (ch.child_gender !== 'male' && ch.child_gender !== 'female') e.child_gender = 'Please choose male or female.';
+    }
+    if (state.referrer_email) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.referrer_email)) e.referrer_email = BAD_EMAIL;
+      else if (emailTypo(state.referrer_email)) e.referrer_email = 'Invalid email address. Did you mean ' + emailTypo(state.referrer_email) + '?';
+      else if (state.referrer_email.toLowerCase() === (state.family.email || '').toLowerCase()) e.referrer_email = 'Please enter the other family\'s email, not yours.';
     }
     if (!state.policy_ack) e.policy_ack = 'Please confirm you understand the minimum class size.';
     return e;
@@ -744,7 +753,7 @@
     var f = state.family;
     var body = {
       method: state.method, plan: state.plan, policy_ack: true, source: location.pathname.slice(0, 40),
-      referred_by: state.referred_by, discount_code: priced().some(function (p) { return p.byCode; }) ? state.code : '', etransfer_from: state.method === 'etransfer' ? state.etransfer_from : '',
+      referred_by: state.referred_by, referrer_email: state.referrer_email, discount_code: priced().some(function (p) { return p.byCode; }) ? state.code : '', etransfer_from: state.method === 'etransfer' ? state.etransfer_from : '',
       family: { parent_name: f.parent_name, email: f.email, phone: f.phone, street_address: f.street_address, city: f.city, province: f.province, postal_code: f.postal_code },
       items: state.items.map(function (it) {
         return { course_id: it.course, child_first_name: it.child.first, child_last_name: it.child.last, child_age: it.child.age, child_gender: it.child.gender };
