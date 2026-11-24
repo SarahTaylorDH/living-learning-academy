@@ -95,7 +95,9 @@ test('the database accepts exactly the options the website offers', () => {
   };
   const keys = (o) => Object.keys(o).sort();
   const interestList = sql.match(/interest_list text := \$l\$([\s\S]*?)\$l\$/);
-  assert.deepEqual(quoted(interestList[1]), keys(INTERESTS));
+  // The database also keeps options we no longer offer, so earlier sign-ups stay valid.
+  const retired = ['creative-arts-media', 'fitness-character'];
+  assert.deepEqual(quoted(interestList[1]), [...keys(INTERESTS), ...retired].sort());
   for (const r of ['skills_allowed', 'interests_allowed', 'requested_allowed', 'child_interests_allowed']) assert.match(sql, new RegExp(`'${r}',\\s+'\\w+ <@ ' \\|\\| interest_list`), r);
   assert.deepEqual(rule('schooling_allowed'), keys(SCHOOLING));
   assert.deepEqual(rule('formats_allowed'), keys(FORMATS));
@@ -119,7 +121,7 @@ test('there is a confirmation email for every form', () => {
 });
 
 test('course and program lists are complete', () => {
-  assert.equal(Object.keys(COURSES).length, 8);
+  assert.equal(Object.keys(COURSES).length, 7);
   assert.equal(Object.keys(PROGRAMS).length, 11);
   for (const p of Object.values(PROGRAMS)) assert.ok(p.labels.every((l) => ['CW', 'CV'].includes(l)));
 });
