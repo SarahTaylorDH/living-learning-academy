@@ -18,7 +18,7 @@ export const AGE_RANGES = { '6-8': 'Ages 6–8', '9-11': 'Ages 9–11', '12-14':
 
 export const SCHOOLING = { public: 'Public school', homeschool: 'Homeschool', private: 'Private or faith-based school', alternative: 'Alternative school or co-op' };
 
-export const FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Hands-on programs and day camps', weekdays: 'Weekdays', weekend: 'Weekends' };
+export const FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Day camps', weekdays: 'Weekdays', weekend: 'Weekends' };
 export const WEEKDAYS = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday' };
 export const GENDERS = { male: 'Male', female: 'Female' };
 
@@ -28,24 +28,23 @@ export const COURSES = {
   'finance-entrepreneurship': { name: 'Finance & Entrepreneurship', desc: 'Manage money wisely and turn ideas into opportunities.' },
   'public-speaking': { name: 'Public Speaking & Influence', desc: 'Speak clearly, communicate courageously and influence with integrity.' },
   'impact-community': { name: 'Impact & Community', desc: 'Put compassion and leadership into action through service.' },
-  'faith-freedom': { name: 'Faith & Freedom', desc: 'Understand and defend the Christian faith, grow in God’s will and explore freedom in Christ and the freedoms that come from Him.' },
+  'faith-freedom': { name: 'Faith & Discipleship', desc: 'Understand and defend the Christian faith, and grow as a follower of Christ in God’s will.' },
   'culture-identity': { name: 'Culture & Identity', desc: 'Explore identity and culture through conservative principles, traditional values and a Christian worldview.' },
-  'civics-citizenship': { name: 'Civics & Citizenship', desc: 'Understand government, rights and your role in Canada’s future.' },
-  'creative-arts-media': { name: 'Creative Arts & Media', desc: 'Develop creative talents and tell stories that shape culture.' },
+  'civics-citizenship': { name: 'Civics, Freedom & Rights', desc: 'Explore freedom in Christ, where our rights come from, how government works and your role in Canada’s future.' },
 };
 
 export const PROGRAMS = {
   'survival-nature': { name: 'Survival, Nature & Character', labels: ['CW'], desc: 'Build outdoor skills, resilience and resourcefulness in nature.' },
   'farming-food': { name: 'Farming, Food & Character', labels: ['CW', 'CV'], desc: 'Learn to prepare and grow food, care for animals and steward the land.' },
-  'build-serve': { name: 'Build, Serve & Character', labels: ['CW', 'CV'], desc: 'Use tools, build, make repairs and put practical skills to work for others.' },
+  'build-serve': { name: 'Build, Serve & Character', labels: ['CW'], desc: 'Designed for boys: use tools, build and make repairs, and grow in godly masculinity through manners, respect and service.' },
   'self-defence': { name: 'Self-Defence & Character', labels: ['CW'], desc: 'Develop personal safety skills, sound judgment and self-control.' },
   'music-dance': { name: 'Music Theatre & Character', labels: ['CW'], desc: 'Sing, act and perform on stage, building confidence, discipline and teamwork.' },
   'dance-character': { name: 'Dance & Character', labels: ['CW'], desc: 'Build discipline, teamwork and confidence through dance and movement.' },
   'film-television': { name: 'Film, Television & Character', labels: ['CW', 'CV'], desc: 'Create shows and documentaries, from filming to editing, and tell stories with integrity.' },
   'journalism-media': { name: 'Journalism, Media & Character', labels: ['CW', 'CV'], desc: 'Report the truth through news writing, podcasts and media, with courage and integrity.' },
   'beauty-character': { name: 'Beauty & Character', labels: ['CW'], desc: 'Explore hair, makeup and personal care grounded in dignity, self-respect and biblical beauty.' },
-  'etiquette-character': { name: 'Etiquette & Character', labels: ['CW'], desc: 'Practice good manners, build social confidence and learn to understand and appreciate biological differences.' },
-  'fitness-character': { name: 'Fitness & Character', labels: ['CW', 'CV'], desc: 'Build strength, healthy habits, good character and perseverance through exercise.' },
+  'etiquette-character': { name: 'Etiquette, Charm & Character', labels: ['CW'], desc: 'Designed for girls: grow in godly femininity through grace, good manners and social confidence.' },
+  'firearm-safety': { name: 'Firearm Safety & Character', labels: ['CW'], desc: 'Learn safe handling, responsibility and respect for the law.' },
 };
 
 const names = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v.name]));
@@ -202,7 +201,7 @@ export function validateSubmission(formType, input) {
 
 // ------------------------------------------------------------------ parent / student survey (its own table: survey_responses)
 export const SURVEY_RESPONDENTS = { parent: 'A parent or guardian', student: 'A student' };
-export const SURVEY_FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Hands-on programs and day camps' };
+export const SURVEY_FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Day camps' };
 export const SURVEY_BUDGETS = { 'under-150': 'Under $150', '150-250': '$150 to $250', '250-350': '$250 to $350', '350-plus': '$350 or more', unsure: 'Not sure yet' };
 export const SURVEY_HEARD = { friend: 'A friend or family member', church: 'Church or ministry', social: 'Social media', search: 'Online search', school: 'School or co-op', event: 'An event', other: 'Somewhere else' };
 export const SURVEY_TOPICS = { ...COURSE_OPTIONS, ...PROGRAM_OPTIONS };
