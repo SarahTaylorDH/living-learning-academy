@@ -35,11 +35,14 @@ export const COURSES = {
 };
 
 export const PROGRAMS = {
-  'survival-nature': { name: 'Survival & Nature', labels: ['CW'], desc: 'Build outdoor skills, resilience and resourcefulness in nature.' },
-  'farming-food': { name: 'Farming & Food', labels: ['CW', 'CV'], desc: 'Learn to prepare and grow food, care for animals and steward the land.' },
-  'build-serve': { name: 'Build & Serve', labels: ['CW', 'CV'], desc: 'Use tools, build, make repairs and put practical skills to work for others.' },
+  'survival-nature': { name: 'Survival, Nature & Character', labels: ['CW'], desc: 'Build outdoor skills, resilience and resourcefulness in nature.' },
+  'farming-food': { name: 'Farming, Food & Character', labels: ['CW', 'CV'], desc: 'Learn to prepare and grow food, care for animals and steward the land.' },
+  'build-serve': { name: 'Build, Serve & Character', labels: ['CW', 'CV'], desc: 'Use tools, build, make repairs and put practical skills to work for others.' },
   'self-defence': { name: 'Self-Defence & Character', labels: ['CW'], desc: 'Develop personal safety skills, sound judgment and self-control.' },
-  'music-dance': { name: 'Music, Dance & Character', labels: ['CW'], desc: 'Build creative skills, discipline and teamwork through music and movement.' },
+  'music-dance': { name: 'Music Theatre & Character', labels: ['CW'], desc: 'Sing, act and perform on stage, building confidence, discipline and teamwork.' },
+  'dance-character': { name: 'Dance & Character', labels: ['CW'], desc: 'Build discipline, teamwork and confidence through dance and movement.' },
+  'film-television': { name: 'Film, Television & Character', labels: ['CW', 'CV'], desc: 'Create shows and documentaries, from filming to editing, and tell stories with integrity.' },
+  'journalism-media': { name: 'Journalism, Media & Character', labels: ['CW', 'CV'], desc: 'Report the truth through news writing, podcasts and media, with courage and integrity.' },
   'beauty-character': { name: 'Beauty & Character', labels: ['CW'], desc: 'Explore hair, makeup and personal care grounded in dignity, self-respect and biblical beauty.' },
   'etiquette-character': { name: 'Etiquette & Character', labels: ['CW'], desc: 'Practice good manners, build social confidence and learn to understand and appreciate biological differences.' },
   'fitness-character': { name: 'Fitness & Character', labels: ['CW', 'CV'], desc: 'Build strength, healthy habits, good character and perseverance through exercise.' },
