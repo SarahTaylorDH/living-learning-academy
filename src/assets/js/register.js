@@ -88,7 +88,7 @@
   // family: parent details (entered once). items: [{ course: slug, child: {first, last, age, gender} }].
   var state = {
     course: null, step: 'details', errors: {}, busy: false, opener: null, notice: '',
-    family: { province: 'BC' }, kidEdit: {}, familyBefore: null, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '',
+    family: { province: 'BC' }, confirm: { email2: '' }, kidEdit: {}, familyBefore: null, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '',
     plan: '', method: '', etransfer_from: '', householdPrior: false, householdKey: '',
     code: '', codePercent: 0, codeNotice: '', codeError: '',
     result: null, bot: false
@@ -313,6 +313,36 @@
     return f.parent_name && f.email && f.phone && f.street_address && f.city && f.province && f.postal_code && !state.editFamily;
   }
 
+  // Email checks: common misspellings, then whether the part after @ can receive mail at all.
+  // Only that part is looked up. If the lookup itself fails, the family can still continue.
+  var EMAIL_TYPOS = { 'gmail.com': 'gmial.com gmai.com gamil.com gmal.com gnail.com gmaill.com gmali.com gmail.co gmail.cm gmail.con gmail.om gmail.ca',
+    'hotmail.com': 'hotmial.com hotmai.com hotmal.com hotmil.com hotmail.con hotmail.cm', 'outlook.com': 'outlok.com outloo.com outlook.con outlook.cm',
+    'yahoo.com': 'yaho.com yhoo.com yahooo.com yahoo.con yahoo.cm', 'icloud.com': 'icoud.com iclod.com icloud.con icloud.cm', 'telus.net': 'telus.ent telus.con', 'shaw.ca': 'shaw.ac shaw.cq' };
+  var domainSeen = {};
+  function emailTypo(email) {
+    var d = String(email || '').split('@').pop().toLowerCase();
+    for (var good in EMAIL_TYPOS) if ((' ' + EMAIL_TYPOS[good] + ' ').indexOf(' ' + d + ' ') >= 0) return good;
+    return '';
+  }
+  function dns(domain, type) {
+    var ctl = new AbortController(), timer = setTimeout(function () { ctl.abort(); }, 4000);
+    return fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=' + type, { signal: ctl.signal })
+      .then(function (r) { if (!r.ok) throw new Error('dns'); return r.json(); })
+      .then(function (j) { clearTimeout(timer); return j; }, function (e) { clearTimeout(timer); throw e; });
+  }
+  function emailReachable(email) {
+    var d = String(email || '').split('@').pop().toLowerCase();
+    if (d in domainSeen) return Promise.resolve(domainSeen[d]);
+    return dns(d, 'MX').then(function (j) {
+      if (j.Status === 3) return false;
+      if (j.Status !== 0) return null;
+      var mx = (j.Answer || []).filter(function (a) { return a.type === 15; });
+      if (mx.length) return !(mx.length === 1 && /^0 \.$/.test(mx[0].data));
+      return dns(d, 'A').then(function (k) { return k.Status === 0 ? (k.Answer || []).some(function (a) { return a.type === 1; }) : null; });
+    }).then(function (ok) { if (ok !== null) domainSeen[d] = ok; return ok !== false; }, function () { return true; });
+  }
+  var BAD_EMAIL = 'Invalid email address. Please check the spelling.';
+
   function viewForm() {
     var gErr = state.errors.child_gender;
     var ch = state.child;
@@ -338,6 +368,7 @@
           '<div class="reg-fields">' +
             field('family', 'parent_name', 'Full name', 'text', ' autocomplete="name" required') +
             field('family', 'email', 'Email', 'email', ' autocomplete="email" required') +
+            field('confirm', 'email2', 'Confirm email', 'email', ' autocomplete="off" required') +
             field('family', 'phone', 'Cell phone', 'tel', ' autocomplete="tel" required') +
             field('family', 'street_address', 'Street address', 'text', ' autocomplete="street-address" required') +
             field('family', 'city', 'City', 'text', ' autocomplete="address-level2" required') +
@@ -401,6 +432,7 @@
       '<h3>Parent or guardian</h3><div class="reg-fields">' +
         field('family', 'parent_name', 'Full name', 'text', ' autocomplete="name" required') +
         field('family', 'email', 'Email', 'email', ' autocomplete="email" required') +
+        field('confirm', 'email2', 'Confirm email', 'email', ' autocomplete="off" required') +
         field('family', 'phone', 'Cell phone', 'tel', ' autocomplete="tel" required') +
         field('family', 'street_address', 'Street address', 'text', ' autocomplete="street-address" required') +
         field('family', 'city', 'City', 'text', ' autocomplete="address-level2" required') +
@@ -423,7 +455,7 @@
       '</form>';
   }
   function startEdit() {
-    state.kidEdit = {}; state.familyBefore = {};
+    state.kidEdit = {}; state.familyBefore = {}; state.confirm.email2 = state.family.email || '';
     FAMILY_FIELDS.forEach(function (n) { state.familyBefore[n] = state.family[n]; });
     kids().forEach(function (k, i) {
       state.kidEdit['kid' + i + '_first'] = k.first; state.kidEdit['kid' + i + '_last'] = k.last;
@@ -433,12 +465,13 @@
   function saveEdit(form) {
     var e = {}, ed = state.kidEdit, list = kids(), names = {};
     FAMILY_FIELDS.forEach(function (n) { state.family[n] = form.elements[n].value.trim(); });
+    state.confirm.email2 = form.elements.email2.value.trim();
     list.forEach(function (k, i) {
       ['first', 'last', 'age'].forEach(function (n) { ed['kid' + i + '_' + n] = form.elements['kid' + i + '_' + n].value.trim(); });
       var g = form.querySelector('input[name="kid' + i + '_gender"]:checked');
       if (g) ed['kid' + i + '_gender'] = g.value;
     });
-    validateFamily(e);
+    validateFamily(e, true);
     list.forEach(function (k, i) {
       var first = ed['kid' + i + '_first'], last = ed['kid' + i + '_last'], age = parseInt(ed['kid' + i + '_age'], 10);
       var key = (first + '|' + last).toLowerCase();
@@ -450,6 +483,14 @@
     });
     state.errors = e;
     if (Object.keys(e).length) { render('[name="' + Object.keys(e)[0] + '"]'); return; }
+    state.busy = true; render();
+    emailReachable(state.family.email).then(function (ok) {
+      state.busy = false;
+      if (!ok) { state.errors = { email: BAD_EMAIL }; render('[name="email"]'); return; }
+      applyEdit(list, ed);
+    });
+  }
+  function applyEdit(list, ed) {
     var map = {};
     list.forEach(function (k, i) {
       map[(k.first + '|' + k.last).toLowerCase()] = { first: ed['kid' + i + '_first'], last: ed['kid' + i + '_last'], age: parseInt(ed['kid' + i + '_age'], 10), gender: ed['kid' + i + '_gender'] };
@@ -614,6 +655,7 @@
 
   // ------------------------------------------------------------ form -> add to cart
   function readForm(form) {
+    if (form.elements.email2) state.confirm.email2 = form.elements.email2.value.trim();
     FAMILY_FIELDS.forEach(function (n) { if (form.elements[n]) state.family[n] = form.elements[n].value.trim(); });
     CHILD_FIELDS.forEach(function (n) { if (form.elements[n]) state.child[n] = form.elements[n].value.trim(); });
     var g = form.querySelector('input[name="child_gender"]:checked');
@@ -621,10 +663,12 @@
     if (form.elements.referred_by) state.referred_by = form.elements.referred_by.value.trim();
     if (form.elements.policy_ack) state.policy_ack = form.elements.policy_ack.checked;
   }
-  function validateFamily(e) {
+  function validateFamily(e, confirming) {
     var f = state.family;
     if (!f.parent_name) e.parent_name = 'Please enter your full name.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email || '')) e.email = 'Please enter a valid email.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email || '')) e.email = BAD_EMAIL;
+    else if (emailTypo(f.email)) e.email = 'Invalid email address. Did you mean ' + emailTypo(f.email) + '?';
+    if (confirming && (f.email || '').toLowerCase() !== (state.confirm.email2 || '').toLowerCase()) e.email2 = 'The two email addresses don\'t match.';
     if ((f.phone || '').replace(/\D/g, '').length < 10) e.phone = 'Please enter a 10-digit phone number.';
     if (!f.street_address) e.street_address = 'Please enter your street address.';
     if (!f.city) e.city = 'Please enter your city.';
@@ -633,7 +677,7 @@
   }
   function validate() {
     var ch = state.child, e = {};
-    validateFamily(e);
+    validateFamily(e, !familyDone());
     if (Object.keys(e).length) state.editFamily = true;
     var known = kids();
     if (known.length && !state.childPick) { e.child_pick = 'Please choose which child this course is for.'; return e; }
@@ -648,6 +692,7 @@
     return e;
   }
   function submit(form) {
+    if (form.elements.email) state.editFamily = true;   // still filling in the parent's details
     readForm(form);
     state.errors = validate();
     if (Object.keys(state.errors).length) {
@@ -656,6 +701,14 @@
       return;
     }
     state.bot = state.bot || Boolean(form.elements.website.value) || Date.now() - openedAt < 2500;
+    state.busy = true; render();
+    emailReachable(state.family.email).then(function (ok) {
+      state.busy = false;
+      if (!ok) { state.errors = { email: BAD_EMAIL }; state.editFamily = true; render('[name="email"]'); return; }
+      addToCart();
+    });
+  }
+  function addToCart() {
     var known = kids();
     var child = known.length && state.childPick !== 'new'
       ? known[parseInt(state.childPick, 10)]
@@ -726,7 +779,7 @@
           state.notice = 'Sorry, ' + esc(c ? c.name : 'one course') + ' just filled up, so we took it out of your registration. Please review and continue, or <a href="/join/">join the waitlist</a>.';
           state.step = 'cart'; render(); return;
         }
-        state.notice = 'Something went wrong starting your checkout. Please try again, or email <a href="mailto:' + esc(CONTACT) + '">' + esc(CONTACT) + '</a>.';
+        state.notice = 'Something went wrong starting your checkout. Please press the <button type="button" class="reg-link" data-go="edit">Back</button> button to confirm your information was entered correctly, then try again. If it still doesn\'t work, email <a href="mailto:' + esc(CONTACT) + '">' + esc(CONTACT) + '</a>.';
         render();
       })
       .catch(function () {
