@@ -90,6 +90,7 @@
     course: null, step: 'details', errors: {}, busy: false, opener: null, notice: '',
     family: { province: 'BC' }, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '',
     plan: '', method: '', etransfer_from: '', householdPrior: false, householdKey: '',
+    code: '', codePercent: 0, codeNotice: '', codeError: '',
     result: null, bot: false
   };
   var openedAt = Date.now();
@@ -111,11 +112,15 @@
   function joinNames(list) { return list.length < 2 ? (list[0] || '') : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]; }
 
   // Prices with the family discount: the first course in a new household is full price, every other one is 10% off.
+  // A discount code applies to one course (whichever is larger, code or family; never both).
   function priced() {
+    var used = false;
     return state.items.map(function (it, i) {
-      var disc = state.householdPrior || i > 0, c = find(it.course), p = c.price || PRICE, m = c.monthly || MONTHLY;
-      return { item: it, course: c, discount: disc,
-        full: disc ? Math.round(p * 0.9) : p, monthly: disc ? Math.round(m * 0.9) : m };
+      var pct = state.householdPrior || i > 0 ? 10 : 0, c = find(it.course), p = c.price || PRICE, m = c.monthly || MONTHLY;
+      var byCode = !used && state.code && state.codePercent > pct;
+      if (byCode) { used = true; pct = state.codePercent; }
+      return { item: it, course: c, discount: pct > 0 && !byCode, byCode: byCode, pct: pct,
+        full: Math.round(p * (100 - pct) / 100), monthly: Math.round(m * (100 - pct) / 100) };
     });
   }
   function totals() {
@@ -143,7 +148,7 @@
     } catch (e) {}
   }
   function clearCart() {
-    state.items = []; state.plan = ''; state.method = ''; state.etransfer_from = '';
+    state.items = []; state.code = ''; state.codePercent = 0; state.codeError = ''; state.plan = ''; state.method = ''; state.etransfer_from = '';
     try { localStorage.removeItem(CART_KEY); } catch (e) {}
     renderBar();
   }
@@ -183,6 +188,32 @@
       body: JSON.stringify({ p_email: state.family.email, p_phone: state.family.phone, p_term: TERM }) })
       .then(function (r) { return r.ok ? r.json() : false; })
       .then(function (yes) { state.householdPrior = yes === true; state.householdKey = key; }, function () {});
+  }
+
+  // Discount codes are checked by the database (and checked again when the order is made).
+  function checkCode(code) {
+    return fetch(api('/rest/v1/rpc/discount_check'), { method: 'POST', headers: apiHeaders(),
+      body: JSON.stringify({ p_code: code, p_email: state.family.email, p_phone: state.family.phone }) })
+      .then(function (r) { if (!r.ok) throw new Error('code'); return r.json(); })
+      .then(function (j) {
+        if (j.ok) { state.code = j.code; state.codePercent = j.percent; state.codeNotice = j.notice || ''; state.codeError = ''; return true; }
+        state.code = ''; state.codePercent = 0;
+        state.codeError = j.reason === 'used' ? 'This code is for a family\'s first registration, and your household has already registered.' : 'We don\'t recognize that code. Please check the spelling.';
+        return false;
+      });
+  }
+  function applyCode() {
+    var el = dialog.querySelector('input[name="discount_code"]'), v = el ? el.value.trim() : '';
+    if (!v || state.busy || !CONNECTED) return;
+    state.busy = true;
+    checkCode(v).catch(function () { state.codeError = 'We couldn\'t check that code. Please try again.'; })
+      .then(function () { state.busy = false; render(); });
+  }
+  function codeNote() { return state.code && state.codeNotice ? '<p class="reg-warn"><strong>NOTE:</strong> ' + esc(state.codeNotice) + '</p>' : ''; }
+  function codeBox() {
+    if (state.code) return '<p class="reg-note reg-hint">Code <strong>' + esc(state.code) + '</strong> applied: ' + state.codePercent + '% off one course. <button type="button" class="reg-link" data-code-remove>Remove</button></p>' + codeNote();
+    return '<div class="reg-fields" style="grid-template-columns:1fr auto;align-items:end"><div><label for="reg-discount_code">Discount code</label><input id="reg-discount_code" name="discount_code" type="text" maxlength="40" autocomplete="off" autocapitalize="characters"' + (state.codeError ? ' aria-invalid="true"' : '') + '></div>' +
+      '<button type="button" class="btn btn--outline" data-code-apply>Apply</button></div>' + (state.codeError ? '<span class="reg-err" role="alert">' + esc(state.codeError) + '</span>' : '');
   }
 
   // Optional series lines under a course name (e.g. Jr. Truth Detectives' current adventure).
@@ -349,12 +380,13 @@
       (list.length
         ? '<ul class="reg-cart">' + list.map(function (p, i) {
             return '<li><div><strong>' + esc(p.course.name) + '</strong><span>' + esc(p.item.child.first + ' ' + p.item.child.last) + ' · Fridays ' + esc(p.course.time) + '</span></div>' +
-              '<div class="reg-cart__price">' + money(p.monthly) + '<small>/month</small>' + (p.discount ? '<em>10% family discount</em>' : '') + '</div>' +
+              '<div class="reg-cart__price">' + money(p.monthly) + '<small>/month</small>' + (p.byCode ? '<em>' + p.pct + '% off with code</em>' : p.discount ? '<em>10% family discount</em>' : '') + '</div>' +
               '<button type="button" class="reg-cart__x" data-remove="' + i + '" aria-label="Remove ' + esc(p.course.name + ' for ' + p.item.child.first) + '">×</button></li>';
           }).join('') + '</ul>' +
           '<p class="reg-cart__total"><span>Total</span><strong>' + money(t.monthly) + '<small>/month for ' + MONTHS + ' months</small></strong></p>' +
           (anyDisc ? '<p class="reg-note reg-hint">Your family discount is included: 10% off ' + (state.householdPrior ? 'every course, since your household already registered this term.' : 'each additional course.') + '</p>' : '<p class="reg-note">Adding another course for any child in your household? It\'s 10% off.</p>')
         : '<p>Your registration is empty.</p>') +
+      (list.length ? codeBox() : '') +
       '<div class="reg-foot"><button type="button" class="btn btn--outline" data-go="pick">+ Add another course</button>' +
         (list.length ? '<button type="button" class="btn btn--gold" data-go="pay">Continue to Payment <span aria-hidden="true">→</span></button>' : '') + '</div>' +
       '</div>';
@@ -395,8 +427,9 @@
           seg('plan', 'monthly', 'Pay monthly', money(t.monthly) + '/month for ' + MONTHS + ' months') +
           seg('plan', 'full', 'Pay in full', 'one payment') +
         '</div>' +
+        codeNote() +
         (state.plan === 'monthly' ? '<p class="reg-note reg-hint">' + money(t.monthly) + ' today and ' + money(t.monthly) + ' one month later, charged to the same card. Then it ends automatically.</p>' : '') +
-        (state.plan === 'full' ? '<p class="reg-note reg-hint">One payment of ' + money(t.full) + '.</p>' +
+        (state.plan === 'full' ? '<p class="reg-note reg-hint">One payment of ' + money(t.full) + ' for the full term' + (priced().some(function (p) { return p.byCode; }) ? ', including your discount code' : '') + '.</p>' +
             '<p class="reg-label" style="margin:6px 0 10px">Pay by</p>' +
             '<div class="reg-seg">' +
               seg('method', 'etransfer', 'e-Transfer', '<span class="reg-pill">Preferred · No fees</span>') +
@@ -441,7 +474,7 @@
         '<h3>' + (names ? esc(names) + (r.kids.length > 1 ? ' are' : ' is') + ' registered!' : 'You\'re registered!') + '</h3>' +
         '<p style="color:var(--muted)">Send your e-Transfer to finish. ' + (r.count > 1 ? 'Your spots are' : 'Your spot is') + ' held for 12 hours while we wait for payment.</p></div>' +
       (r.total ? '<div class="reg-paycard"><p class="reg-label">Send your e-Transfer</p><div class="reg-kv">' +
-          '<p><span>Amount</span><strong>' + money(r.total) + (r.discount ? ' <small style="font-weight:400">(includes your family discount)</small>' : '') + '</strong></p>' +
+          '<p><span>Amount</span><strong>' + money(r.total) + ' <small style="font-weight:400">for the full term' + (r.code ? ', with code ' + esc(r.code) : '') + (r.discount ? (r.code ? ' and' : ', with') + ' your family discount' : '') + '</small>' + '</strong></p>' +
           '<p><span>To</span><strong>' + esc(r.to || ETRANSFER_EMAIL) + '</strong></p>' +
           '<p><span>Message</span><strong>' + esc(r.message || '') + '</strong></p>' +
         '</div><p class="reg-note">We\'ve emailed you these details too. Once your e-Transfer arrives, we\'ll email a thank-you with the address and everything you need for the first class.</p></div>' : '') +
@@ -581,13 +614,20 @@
     var f = state.family;
     var body = {
       method: state.method, plan: state.plan, policy_ack: true, source: location.pathname.slice(0, 40),
-      referred_by: state.referred_by, etransfer_from: state.method === 'etransfer' ? state.etransfer_from : '',
+      referred_by: state.referred_by, discount_code: priced().some(function (p) { return p.byCode; }) ? state.code : '', etransfer_from: state.method === 'etransfer' ? state.etransfer_from : '',
       family: { parent_name: f.parent_name, email: f.email, phone: f.phone, street_address: f.street_address, city: f.city, province: f.province, postal_code: f.postal_code },
       items: state.items.map(function (it) {
         return { course_id: it.course, child_first_name: it.child.first, child_last_name: it.child.last, child_age: it.child.age, child_gender: it.child.gender };
       })
     };
     state.busy = true; render();
+    // Re-check the code first, so nobody pays a different amount than the one they saw.
+    (state.code ? checkCode(state.code) : Promise.resolve(true)).then(function (valid) {
+      if (!valid) { state.busy = false; state.notice = esc(state.codeError) + ' Your total has been updated.'; state.step = 'cart'; render(); return; }
+      send(body, summary);
+    }).catch(function () { state.busy = false; state.notice = 'We couldn\'t check your discount code. Please try again.'; render(); });
+  }
+  function send(body, summary) {
     fetch(api('/functions/v1/checkout'), { method: 'POST', headers: apiHeaders(), body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
@@ -597,6 +637,7 @@
         if (res.ok && j.method === 'etransfer') {
           summary.total = j.total_cents; summary.message = j.etransfer_message; summary.to = j.etransfer_to || ETRANSFER_EMAIL;
           summary.discount = (j.items || []).some(function (i) { return i.family_discount; });
+          summary.code = ((j.items || []).filter(function (i) { return i.discount_code; })[0] || {}).discount_code || '';
           state.result = summary; clearCart(); loadSpots();
           state.step = 'thanks'; render(); return;
         }
@@ -626,6 +667,8 @@
     if (overlay.hidden) return;
     if (e.target === overlay || e.target.closest('[data-close]')) { close(); return; }
     if (e.target.closest('[data-checkout]')) { checkout(); return; }
+    if (e.target.closest('[data-code-apply]')) { applyCode(); return; }
+    if (e.target.closest('[data-code-remove]')) { state.code = ''; state.codePercent = 0; state.codeError = ''; render(); return; }
     var rm = e.target.closest('[data-remove]');
     if (rm) { state.items.splice(parseInt(rm.getAttribute('data-remove'), 10), 1); state.notice = ''; persist(); render(); return; }
     var ch = e.target.closest('[data-child]');
