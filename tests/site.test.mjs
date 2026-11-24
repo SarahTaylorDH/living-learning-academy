@@ -57,7 +57,7 @@ test('approved homepage wording is present verbatim', () => {
     'Find Your Place.', 'Help Raise the Next Generation.', 'We’re bringing that village back.',
     'Leave the academics to the schools.', 'We’ll take care of the rest.', 'Raise Bold Youth Today.',
     'a sense of duty to God, family, community and country.', 'Teaching & Curriculum',
-    'For a Stronger Canada Tomorrow.', 'Teach & Bring LLA to Your Students', 'Find Your People. Make an Impact.',
+    'For a Stronger Canada Tomorrow.', 'Teach & Bring LLA to Your Learners', 'Find Your People. Make an Impact.',
   ]) assert.ok(text.includes(phrase.replace('&', '&amp;')) || text.includes(phrase), `missing: ${phrase}`);
 });
 
