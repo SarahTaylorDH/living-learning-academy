@@ -244,7 +244,7 @@
           '<span class="reg-card__blurb">' + esc(c.blurb) + '</span>' +
           '<span class="reg-learn">' + c.learn.map(function (l) { return '<span>' + esc(l) + '</span>'; }).join('') + '</span>' +
           '<span class="reg-mentor"><span class="reg-mentor__label">Your Mentor</span><span class="reg-mentor__name">' + esc(c.mentor) + '</span><span class="reg-mentor__creds">' + esc(c.creds) + '</span></span>' +
-          '<span class="reg-card__foot"><span class="reg-price">' + money(MONTHLY) + '<small>/month</small><small class="reg-price__alt">for ' + MONTHS + ' months</small></span><span class="btn btn--gold">' + (isFull(c) ? 'Full · Join Waitlist' : 'Details &amp; Register') + ' <span aria-hidden="true">→</span></span></span>' +
+          '<span class="reg-card__foot"><span class="reg-price">' + money(c.monthly || MONTHLY) + '<small> per month</small><small class="reg-price__alt">Course runs ' + MONTHS + ' months &middot; ' + money(c.price || PRICE) + ' total</small></span><span class="btn btn--gold">' + (isFull(c) ? 'Full · Join Waitlist' : 'Details &amp; Register') + ' <span aria-hidden="true">→</span></span></span>' +
           '</button></li>';
       }).join('');
       Array.prototype.forEach.call(cards.querySelectorAll('[data-course-card]'), function (li) { li.remove(); });
@@ -292,7 +292,7 @@
         '<p><strong>Where:</strong> ' + esc(placeOf(c)) + ' (address emailed once you\'ve paid)</p>' +
         '<p><strong>Class size:</strong> 8–' + c.max + ' learners' + spotsText(c, ' · ') + '</p>' +
       '</div>' +
-      '<div class="reg-foot"><div class="reg-cost"><p><span class="reg-price" style="font-size:30px">' + money(MONTHLY) + '<small>/month for ' + MONTHS + ' months</small></span></p>' +
+      '<div class="reg-foot"><div class="reg-cost"><p><span class="reg-price" style="font-size:30px">' + money(MONTHLY) + '<small> per month</small></span></p><p class="reg-price__note">This course runs ' + MONTHS + ' months, so you pay ' + money(MONTHLY) + ' a month for ' + MONTHS + ' months (' + money(PRICE) + ' total), or pay in full.</p>' +
         '<p class="reg-note">Pay monthly, or pay in full</p>' +
         '<p class="reg-note"><strong>Family discount:</strong> 10% off each additional course in your household</p></div>' +
       (isFull(c)
