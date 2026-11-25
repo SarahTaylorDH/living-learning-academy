@@ -292,7 +292,7 @@
         '<p><strong>Where:</strong> ' + esc(placeOf(c)) + ' (address emailed once you\'ve paid)</p>' +
         '<p><strong>Class size:</strong> 8–' + c.max + ' learners' + spotsText(c, ' · ') + '</p>' +
       '</div>' +
-      '<div class="reg-foot"><div class="reg-cost"><p><span class="reg-price" style="font-size:30px">' + money(MONTHLY) + '<small> per month</small></span></p><p class="reg-price__note">This course runs ' + MONTHS + ' months, so you pay ' + money(MONTHLY) + ' a month for ' + MONTHS + ' months (' + money(PRICE) + ' total), or pay in full.</p>' +
+      '<div class="reg-foot"><div class="reg-cost"><p><span class="reg-price" style="font-size:30px">' + money(MONTHLY) + '<small> per month</small></span></p><p class="reg-price__note">This course runs ' + MONTHS + ' months (8 weeks). Pay ' + money(MONTHLY) + ' a month or in full.</p>' +
         '<p class="reg-note">Pay monthly, or pay in full</p>' +
         '<p class="reg-note"><strong>Family discount:</strong> 10% off each additional course in your household</p></div>' +
       (isFull(c)
