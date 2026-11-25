@@ -201,3 +201,5 @@ body.reg-lock { overflow: hidden; }
 .reg-bar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .reg-bar[hidden] { display: none; }
 @media (max-width: 480px) { .reg-cart li { grid-template-columns: minmax(0, 1fr) auto; } .reg-cart__price { grid-column: 1; text-align: left; } .reg-cart__x { grid-row: 1; grid-column: 2; } .reg-bar { border-radius: 14px; } }
+
+.reg-price__note { margin: 8px 0 0; font: 400 14px/1.5 var(--sans); color: var(--muted); }
