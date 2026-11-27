@@ -18,7 +18,7 @@ export const AGE_RANGES = { '6-8': 'Ages 6–8', '9-11': 'Ages 9–11', '12-14':
 
 export const SCHOOLING = { public: 'Public school', homeschool: 'Homeschool', private: 'Private or faith-based school', alternative: 'Alternative school or co-op' };
 
-export const FORMATS = { 'in-person': 'In person', online: 'Online', 'hands-on': 'Day camps', weekdays: 'Weekdays', weekend: 'Weekends' };
+export const FORMATS = { 'in-person': 'In person', online: 'Online courses & at-home workbooks (when available)', 'hands-on': 'Day camps', weekdays: 'Weekdays', weekend: 'Weekends' };
 export const WEEKDAYS = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday' };
 export const GENDERS = { male: 'Male', female: 'Female' };
 
