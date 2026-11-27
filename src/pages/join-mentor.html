@@ -3,7 +3,7 @@
 <section class="page-hero">
   <p class="eyebrow eyebrow--light">Teaching &amp; Curriculum</p>
   <h1>Become an LLA Mentor.</h1>
-  <p>Have valuable skills to pass on to the next generation? Tell us what you could teach and why you’d like to help.</p>
+  <p>Have valuable skills to pass on to the next generation? Tell us about your experience, the skills you’d love to teach and why you’d like to be considered.</p>
 </section>
 
 <div class="form-shell">
@@ -31,9 +31,15 @@
     <fieldset class="form-section">
       <legend class="form-section__title">A little more about you</legend>
       <div class="field">
-        <label for="motivation">Why would you like to help teach the next generation of leaders? <span class="req" aria-hidden="true">*</span></label>
-        <span class="hint">Tell us about your experience and what you’d love to pass on.</span>
-        <textarea id="motivation" name="motivation" maxlength="2000" required></textarea>
+        <label for="experience">Tell us about your experience <span class="req" aria-hidden="true">*</span></label>
+        <span class="hint">Work, trades, training or certifications, and any coaching, teaching or volunteering with children or youth that relates to the skills you chose.</span>
+        <textarea id="experience" name="experience" maxlength="950" required></textarea>
+        <p class="error" data-error-for="experience" hidden></p>
+      </div>
+      <div class="field">
+        <label for="motivation">Why would you like to be considered to teach these skills to the next generation? <span class="req" aria-hidden="true">*</span></label>
+        <span class="hint">What draws you to mentoring youth, and what do you hope they’ll take away from learning with you?</span>
+        <textarea id="motivation" name="motivation" maxlength="950" required></textarea>
         <p class="error" data-error-for="motivation" hidden></p>
       </div>
       <label class="choice"><input type="checkbox" name="has_children"> <span>I also have children who may want to take part. <span class="hint-inline">We’ll invite you to add them next.</span></span></label>

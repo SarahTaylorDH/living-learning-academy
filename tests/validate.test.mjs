@@ -62,11 +62,14 @@ test('text consent is ignored without a phone number; privacy consent is require
 test('mentor form needs skills, a reason and a phone; "other" needs a description', () => {
   assert.ok(validateSubmission('mentor', { ...contact }).errors.skills);
   assert.ok(validateSubmission('mentor', { ...contact, skills: ['build-serve'] }).errors.motivation);
-  assert.ok(validateSubmission('mentor', { ...contact, skills: ['build-serve'], motivation: 'x' }).errors.phone);
-  assert.ok(validateSubmission('mentor', { ...contact, phone: '4035551234', skills: ['other'], motivation: 'I love it' }).errors.skills_other);
-  const ok = validateSubmission('mentor', { ...contact, phone: '4035551234', skills: ['build-serve', 'other'], skills_other: 'Welding', motivation: 'I love it', has_children: true });
+  assert.ok(validateSubmission('mentor', { ...contact, skills: ['build-serve'], experience: 'Coach', motivation: 'x' }).errors.phone);
+  assert.ok(validateSubmission('mentor', { ...contact, phone: '4035551234', skills: ['other'], experience: 'Coach', motivation: 'I love it' }).errors.skills_other);
+  const ok = validateSubmission('mentor', { ...contact, phone: '4035551234', skills: ['build-serve', 'other'], skills_other: 'Welding', experience: 'Welder 10 years', motivation: 'I love it', has_children: true });
   assert.deepEqual(ok.errors, {});
   assert.equal(ok.data.has_children, true);
+  assert.ok(validateSubmission('mentor', { ...contact, skills: ['build-serve'], motivation: 'x' }).errors.experience);
+  assert.match(ok.data.motivation, /^Experience:\nWelder 10 years\n\nWhy I’d like to teach:\nI love it$/);
+  assert.equal('experience' in ok.data, false);
 });
 
 test('community form: choose a community or request an event; teens need parent permission', () => {
