@@ -44,7 +44,7 @@ export const PROGRAMS = {
   'journalism-media': { name: 'Journalism, Media & Character', labels: ['CW', 'CV'], desc: 'Report the truth through news writing, podcasts and media, with courage and integrity.' },
   'beauty-character': { name: 'Beauty & Character', labels: ['CW'], desc: 'Explore hair, makeup and personal care grounded in dignity, self-respect and biblical beauty.' },
   'etiquette-character': { name: 'Etiquette, Charm & Character', labels: ['CW'], desc: 'Designed for girls: grow in godly femininity through grace, good manners and social confidence.' },
-  'firearm-safety': { name: 'Firearm Safety & Character', labels: ['CW'], desc: 'Learn safe handling, responsibility and respect for the law.' },
+  'firearm-safety': { name: 'Firearm Safety & Character', labels: ['CV'], desc: 'Learn safe handling, responsibility and an understanding of Canada’s firearm laws.' },
 };
 
 const names = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v.name]));
