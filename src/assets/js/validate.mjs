@@ -158,7 +158,14 @@ export function validateSubmission(formType, input) {
     if (!data.skills.length) errors.skills = 'Please choose at least one skill you could teach.';
     if (data.skills.includes('other') && data.skills_other.length < 2) errors.skills_other = 'Please tell us your other skill.';
     if (data.skills_other.length > 200) errors.skills_other = 'Please keep this under 200 characters.';
-    longText(data, errors, 'motivation', input.motivation, { required: true, label: 'Telling us why you’d like to help' });
+    // Two questions on the form, saved together in the one `motivation` column (no database change needed).
+    const experience = cleanLong(input.experience);
+    const why = cleanLong(input.motivation);
+    if (!experience) errors.experience = 'Telling us about your experience is required.';
+    else if (experience.length > 950) errors.experience = 'Please keep this under 950 characters.';
+    if (!why) errors.motivation = 'Telling us why you’d like to teach is required.';
+    else if (why.length > 950) errors.motivation = 'Please keep this under 950 characters.';
+    data.motivation = `Experience:\n${experience}\n\nWhy I’d like to teach:\n${why}`;
     data.has_children = yes(input.has_children);
     if (!data.phone && !errors.phone) errors.phone = 'Please enter a phone number so we can reach you.';
   }
