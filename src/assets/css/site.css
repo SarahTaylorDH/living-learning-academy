@@ -445,3 +445,10 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .emailpop .link-btn { display: block; margin: 10px auto 0; }
 .emailpop__done { text-align: center; padding: 10px 0; }
 .emailpop .error { color: #a12a2a; font-size: 14px; margin: 6px 0 0; }
+
+/* CW / CV legend (one explanation above the lists, not on each card) */
+.values-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 14px 0 20px; font: 400 14px/1.4 var(--sans); color: var(--muted); }
+.values-legend__label { font-weight: 700; color: var(--navy); }
+.values-legend__btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 14px; background: #fff; border: 1px solid #d9cfba; border-radius: 999px; font: inherit; color: var(--navy); cursor: pointer; }
+.values-legend__btn:hover, .values-legend__btn:focus-visible { border-color: var(--gold); }
+.values-legend__i { color: var(--gold-dark); font-size: 16px; }
