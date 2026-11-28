@@ -57,9 +57,10 @@ create or replace function public.lla_funding_course_text(o public.orders)
 returns text language sql stable set search_path = public as $$
   select '<p>In <strong>' || lla_html(lla_join(array(select distinct x->>'name' from jsonb_array_elements(o.items) x))) || '</strong>, '
     || lla_html(lla_join(lla_order_children(o))) || ' will practise real-world life skills in a small, hands-on group alongside peers. '
-    || case when (select count(distinct x->>'name') from jsonb_array_elements(o.items) x) > 1 then 'These courses' else 'The course' end
-    || ' can support and enrich your child''s learning in <strong>Applied Design, Skills and Technologies (ADST)</strong> and <strong>Career Education</strong>, '
-    || 'and build social and communication skills in a group setting.</p>';
+    || case when (select count(distinct x->>'name') from jsonb_array_elements(o.items) x) > 1
+         then 'These courses build social and communication skills in a group setting, and support and enrich learning in <strong>Applied Design, Skills and Technologies (ADST)</strong> and <strong>Career Education</strong>. They can also'
+         else 'The course builds social and communication skills in a group setting, and supports and enriches learning in <strong>Applied Design, Skills and Technologies (ADST)</strong> and <strong>Career Education</strong>. It can also' end
+    || ' support your child''s IEP goals, with optional extra support in class.</p>';
 $$;
 
 create or replace function public.lla_funding_label(p text)
@@ -287,7 +288,9 @@ begin
         || '<p>Because you told us your child has a disability or additional support needs, someone from our support team will contact you '
         || '(you asked: <strong>' || lla_html(o.best_contact) || '</strong>) to:</p>'
         || '<ul style="padding-left:20px">'
-        || '<li>talk about what helps your child do well, including whether a support worker would help in class</li>'
+        || '<li>talk about what helps your child do well, including whether a support worker would help in class'
+        || case when 'autism' = any(coalesce(o.support_types, '{}')) or o.funding_source = 'autism-funding'
+                then ' and how we can best support autistic learners' else '' end || '</li>'
         || '<li>connect the course to your child''s IEP goals, if they have an IEP</li>'
         || '<li>help you with the next steps for ' || lla_html(lla_funding_label(o.funding_source)) || '</li></ul>'
         || case o.funding_source
