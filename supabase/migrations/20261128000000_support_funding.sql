@@ -3,7 +3,7 @@
 -- A family can tick "My child has a disability or additional support needs" on the payment step,
 -- answer a few short questions, and say how they'll pay:
 --   * Self-pay: they pay by card or e-Transfer as usual. support@ gets the support details.
---   * Funding (OL school, Autism Funding, other, or "not sure"): no payment is taken.
+--   * Funding (OL school, Autism Funding or other funding): no payment is taken.
 --     The order is saved with method = 'funding', the spot is HELD, and support@ is alerted to call.
 --
 -- How a funding hold works (staff do steps 2 and 3 in Supabase > Table Editor > orders):
@@ -28,7 +28,8 @@ alter table public.orders add constraint orders_method_check
 -- ---------------------------------------------------------------- support details (staff only: orders has no public access)
 alter table public.orders
   add column if not exists support_needs        boolean not null default false,
-  add column if not exists funding_source       text check (funding_source in ('self-pay', 'ol-school', 'autism-funding', 'other', 'not-sure')),
+  add column if not exists funding_source       text check (funding_source in ('self-pay', 'ol-school', 'autism-funding', 'other')),
+  add column if not exists support_types        text[] check (support_types <@ array['autism','adhd','learning','developmental','physical','sensory-communication','behavioural-emotional','other']),
   add column if not exists ol_school            text check (char_length(ol_school) <= 120),
   add column if not exists support_notes        text check (char_length(support_notes) <= 600),
   add column if not exists best_contact         text check (char_length(best_contact) <= 200),
@@ -41,6 +42,16 @@ returns text[] language sql immutable as $$
   select array['support@livinglearningacademy.com'];
 $$;
 
+create or replace function public.lla_support_types_label(p text[])
+returns text language sql immutable as $$
+  select coalesce(nullif(array_to_string(array(select case x
+    when 'autism' then 'Autism (ASD)' when 'adhd' then 'ADHD or attention'
+    when 'learning' then 'Learning disability' when 'developmental' then 'Developmental or intellectual disability'
+    when 'physical' then 'Physical disability or mobility' when 'sensory-communication' then 'Hearing, vision or communication'
+    when 'behavioural-emotional' then 'Behavioural, social or emotional' when 'other' then 'Other' else x end
+    from unnest(p) x), ', '), ''), '(not given)');
+$$;
+
 create or replace function public.lla_funding_label(p text)
 returns text language sql immutable as $$
   select case p
@@ -48,7 +59,6 @@ returns text language sql immutable as $$
     when 'ol-school' then 'OL school learning funds'
     when 'autism-funding' then 'Autism Funding'
     when 'other' then 'Other funding'
-    when 'not-sure' then 'Not sure yet (wants help)'
     else coalesce(p, '(not given)') end;
 $$;
 
@@ -148,10 +158,11 @@ begin
   if pl = 'monthly' and meth <> 'card' then raise exception 'monthly_is_card_only'; end if;
   if meth = 'funding' then
     if not v_support then raise exception 'funding_needs_support_details'; end if;
-    if v_source is null or v_source not in ('ol-school', 'autism-funding', 'other', 'not-sure') then raise exception 'bad_funding_source'; end if;
+    if v_source is null or v_source not in ('ol-school', 'autism-funding', 'other') then raise exception 'bad_funding_source'; end if;
   end if;
   if v_support then
-    if v_source is null or v_source not in ('self-pay', 'ol-school', 'autism-funding', 'other', 'not-sure') then raise exception 'bad_funding_source'; end if;
+    if v_source is null or v_source not in ('self-pay', 'ol-school', 'autism-funding', 'other') then raise exception 'bad_funding_source'; end if;
+    if jsonb_typeof(s->'types') is distinct from 'array' or jsonb_array_length(s->'types') = 0 then raise exception 'support_types_required'; end if;
     if char_length(trim(coalesce(s->>'best_contact', ''))) < 3 then raise exception 'best_contact_required'; end if;
   end if;
   if jsonb_typeof(p->'items') is distinct from 'array' or jsonb_array_length(p->'items') not between 1 and 8 then raise exception 'bad_items'; end if;
@@ -167,11 +178,12 @@ begin
    where status = 'pending' and method = 'card' and household_key(email, phone) = hkey;
 
   insert into public.orders (id, parent_name, email, phone, method, plan, etransfer_from, referred_by, source,
-                             support_needs, funding_source, ol_school, support_notes, best_contact)
+                             support_needs, funding_source, support_types, ol_school, support_notes, best_contact)
   values (oid, left(f->>'parent_name', 120), left(f->>'email', 200), left(f->>'phone', 40), meth, pl,
           case when meth = 'etransfer' then left(coalesce(nullif(trim(p->>'etransfer_from'), ''), f->>'email'), 200) end,
           nullif(left(trim(coalesce(p->>'referred_by', '')), 120), ''), left(p->>'source', 40),
           v_support, case when v_support then v_source end,
+          case when v_support then array(select jsonb_array_elements_text(s->'types')) end,
           case when v_support then nullif(left(trim(coalesce(s->>'ol_school', '')), 120), '') end,
           case when v_support then nullif(left(trim(coalesce(s->>'notes', '')), 600), '') end,
           case when v_support then left(trim(s->>'best_contact'), 200) end);
@@ -241,6 +253,7 @@ begin
       || row || 'Email</td><td>' || lla_html(o.email) || '</td></tr>'
       || row || 'Phone</td><td>' || lla_html(o.phone) || '</td></tr>'
       || row || 'Best way and time</td><td><strong>' || lla_html(o.best_contact) || '</strong></td></tr>'
+      || row || 'Type of support need</td><td><strong>' || lla_html(lla_support_types_label(o.support_types)) || '</strong></td></tr>'
       || row || 'Paying by</td><td>' || lla_html(lla_funding_label(o.funding_source)) || coalesce(' · ' || lla_html(o.ol_school), '') || '</td></tr>'
       || row || 'What helps their child</td><td>' || coalesce(nullif(lla_html(o.support_notes), ''), '(not given)') || '</td></tr>'
       || '</table>'
@@ -347,7 +360,8 @@ revoke all on function public.lla_send_thank_you(uuid) from public, anon, authen
 
 -- Staff views: support-needs orders still in progress, newest first.
 create or replace view public.support_intake as
-  select o.created_at, o.status, o.method, lla_funding_label(o.funding_source) as paying_by, o.ol_school,
+  select o.created_at, o.status, o.method, lla_support_types_label(o.support_types) as support_type,
+         lla_funding_label(o.funding_source) as paying_by, o.ol_school,
          o.parent_name, o.email, o.phone, o.best_contact, o.support_notes,
          lla_join(lla_order_children(o)) as children,
          (select string_agg(x->>'name', ', ') from jsonb_array_elements(o.items) x) as courses,

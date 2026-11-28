@@ -180,6 +180,7 @@ body.reg-lock { overflow: hidden; }
 .reg-support textarea { width: 100%; box-sizing: border-box; min-height: 84px; padding: 10px 12px; border: 1px solid #cfc6b5; border-radius: var(--radius); font: 16px/1.5 var(--sans); color: var(--ink); background: #fff; }
 .reg-support .reg-fields label span { letter-spacing: 0; }
 .reg-seg--stack { grid-template-columns: 1fr 1fr; }
+.reg-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px 16px; }
 @media (max-width: 480px) { .reg-seg { grid-template-columns: 1fr; } }
 /* Your registration (cart) */
 .reg-cart { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }

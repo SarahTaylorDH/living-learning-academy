@@ -17,6 +17,13 @@
 - [ ] **Online donations:** Stripe Payment Link → `DONATE_URL` (DONATIONS.md). The e-Transfer option works now.
 - [ ] **Hosting** (Cloudflare Pages or Netlify), then the domain switch after approval.
 
+## Staff to-do: support-needs families (added Nov 28, 2026)
+- [ ] **Every support-needs registration needs a staff update in Supabase** (Table Editor → `orders`), or the hold won't move. See `docs/SUPPORT.md`.
+  - After the first call, text or email: set `contact_attempted_at`. The hold ends 48 hours later unless they reply.
+  - When the family replies: set `family_replied_at` (holds 30 more days while funding is arranged).
+  - When funding is approved or they pay: set `status` to `paid`.
+  - Check the `support_intake` view for who's waiting.
+
 ## Content still needed from the founders
 - [ ] **CW / CV labels for the 8 courses** (only the hands-on programs were labelled).
 - [ ] The Code that mentors and students commit to (About page says "being finalized").

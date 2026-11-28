@@ -2,17 +2,18 @@
 
 On the **Payment** step of `/register/`, families can tick **"My child has a disability or additional support needs."** They then answer:
 
-1. What helps their child do well in a group (optional, no medical details)
-2. How they plan to pay: *I'll pay myself*, *OL school learning funds*, *Autism Funding*, *Other funding*, or *Not sure*
-3. OL school name (only if they chose OL school; optional)
-4. Best way and time to reach them (required)
+1. What type of support need (required, choose all that apply): Autism (ASD); ADHD or attention; Learning disability; Developmental or intellectual disability; Physical disability or mobility; Hearing, vision or communication; Behavioural, social or emotional; Other. Families with allergies or medical needs only are told not to tick the box; those go on the child information form.
+2. What helps their child do well in a group (optional, no medical details)
+3. How they plan to pay: *I'll pay myself*, *OL school learning funds*, *Autism Funding* or *Other funding*. If they pick OL school and a course is CW, they see a note that OL schools usually can't fund CW courses.
+4. OL school name (only if they chose OL school; optional)
+5. Best way and time to reach them (required)
 
 ## What happens next
 
 | They chose | Payment today | Spot | Emails |
 | --- | --- | --- | --- |
 | I'll pay myself | Card or e-Transfer, as usual | Normal hold (12 h e-Transfer, 24 h card) | Usual family emails, plus a **"Support intake needed"** alert to support@ |
-| Any funding option or Not sure | **None** | **Held** (see below) | Family: "We've received …'s registration". support@: "Support intake needed". payments@ and Ariyah: the usual new-registration alert |
+| Any funding option | **None** | **Held** (see below) | Family: "We've received …'s registration". support@: "Support intake needed". payments@ and Ariyah: the usual new-registration alert |
 
 support@livinglearningacademy.com goes to Drea, Ariyah and Diane.
 

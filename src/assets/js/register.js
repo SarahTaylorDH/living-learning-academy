@@ -93,7 +93,7 @@
     code: '', codePercent: 0, codeCents: 0, codeNotice: '', codeError: '',
     result: null, bot: false,
     // Support needs and funding (payment step). Saved with the order; support@ contacts the family.
-    support: false, supportNotes: '', fundingSource: '', olSchool: '', bestContact: ''
+    support: false, supportTypes: [], supportNotes: '', fundingSource: '', olSchool: '', bestContact: ''
   };
   var openedAt = Date.now();
 
@@ -152,7 +152,7 @@
   }
   function clearCart() {
     state.items = []; state.code = ''; state.codePercent = 0; state.codeError = ''; state.plan = ''; state.method = ''; state.etransfer_from = '';
-    state.support = false; state.supportNotes = ''; state.fundingSource = ''; state.olSchool = ''; state.bestContact = '';
+    state.support = false; state.supportTypes = []; state.supportNotes = ''; state.fundingSource = ''; state.olSchool = ''; state.bestContact = '';
     try { localStorage.removeItem(CART_KEY); } catch (e) {}
     renderBar();
   }
@@ -524,16 +524,24 @@
 
   // Support needs and funding: a short section at the top of the payment step.
   var FUNDING = [['self-pay', 'I\'ll pay myself', 'by card or e-Transfer, below'], ['ol-school', 'OL school learning funds', 'online learning school'],
-    ['autism-funding', 'Autism Funding', 'BC government funding'], ['other', 'Other funding', ''], ['not-sure', 'Not sure', 'please help me']];
+    ['autism-funding', 'Autism Funding', 'BC government funding'], ['other', 'Other funding', '']];
+  var SUPPORT_TYPES = [['autism', 'Autism (ASD)'], ['adhd', 'ADHD or attention'], ['learning', 'Learning disability'], ['developmental', 'Developmental or intellectual disability'],
+    ['physical', 'Physical disability or mobility'], ['sensory-communication', 'Hearing, vision or communication'], ['behavioural-emotional', 'Behavioural, social or emotional'], ['other', 'Other']];
   function funded() { return state.support && state.fundingSource && state.fundingSource !== 'self-pay'; }
   function supportBox() {
     var e = state.errors;
     var html = '<div class="reg-support">' +
-      '<label class="reg-check"><input type="checkbox" name="support"' + (state.support ? ' checked' : '') + '> <span><strong>My child has a disability or additional support needs.</strong> Help us plan for them.</span></label>';
+      '<label class="reg-check"><input type="checkbox" name="support"' + (state.support ? ' checked' : '') + '> <span><strong>My child has a disability or additional support needs.</strong> Help us plan for them.</span></label>' +
+      '<p class="reg-note" style="margin:0 0 0 30px">Allergies or medical needs only? No need to tick this. We\'ll ask about those on the child information form after you register.</p>';
     if (!state.support) return html + '</div>';
     return html +
       '<p class="reg-note">Students with disabilities and additional support needs are welcome at LLA. A few quick questions help us plan the right support and, if you\'re using funding, help you get it in place. Your answers are private.</p>' +
-      '<div class="reg-fields" style="grid-template-columns:1fr">' +
+      '<p class="reg-label" style="margin:8px 0 10px">What type of support need? <span style="font-weight:400">(choose all that apply)</span></p>' +
+      '<div class="reg-types">' + SUPPORT_TYPES.map(function (t) {
+        return '<label class="reg-check"><input type="checkbox" name="support_type" value="' + t[0] + '"' + (state.supportTypes.indexOf(t[0]) >= 0 ? ' checked' : '') + (e.support_type ? ' aria-invalid="true"' : '') + '> <span>' + t[1] + '</span></label>';
+      }).join('') + '</div>' +
+      (e.support_type ? '<span class="reg-err" role="alert">' + esc(e.support_type) + '</span>' : '') +
+      '<div class="reg-fields" style="grid-template-columns:1fr;margin-top:8px">' +
         '<div><label for="reg-support_notes">In a few words, what helps your child do well in a group? <span style="font-weight:400">(optional)</span></label>' +
           '<textarea id="reg-support_notes" name="support_notes" rows="3" maxlength="600">' + esc(state.supportNotes) + '</textarea>' +
           '<span class="reg-note" style="display:block;margin-top:6px">No medical details needed here. We\'ll talk about the rest by phone.</span></div>' +
@@ -542,6 +550,10 @@
       '<div class="reg-seg reg-seg--stack">' + FUNDING.map(function (f) { return seg('fundingSource', f[0], f[1], f[2]); }).join('') + '</div>' +
       (e.fundingSource ? '<span class="reg-err" role="alert">' + esc(e.fundingSource) + '</span>' : '') +
       '<div class="reg-fields" style="grid-template-columns:1fr;margin-top:12px">' +
+        (state.fundingSource === 'ol-school' && priced().some(function (p) { return p.course.fw === 'CW'; })
+          ? '<p class="reg-warn" style="margin:0">Heads up: OL schools usually can\'t fund courses taught from a Christian worldview (CW). ' +
+            esc(joinNames(priced().filter(function (p) { return p.course.fw === 'CW'; }).map(function (p) { return p.course.name; }))) +
+            ' ' + (priced().filter(function (p) { return p.course.fw === 'CW'; }).length > 1 ? 'are' : 'is') + ' CW, so your OL school may not approve it. Our support team will talk it through with you.</p>' : '') +
         (state.fundingSource === 'ol-school' ? '<div><label for="reg-ol_school">OL school name <span style="font-weight:400">(optional)</span></label><input id="reg-ol_school" name="ol_school" type="text" maxlength="120" value="' + esc(state.olSchool) + '"></div>' : '') +
         '<div><label for="reg-best_contact">Best way and time to reach you</label>' +
           '<input id="reg-best_contact" name="best_contact" type="text" maxlength="200" placeholder="e.g. Text, weekday evenings" value="' + esc(state.bestContact) + '"' + (e.best_contact ? ' aria-invalid="true"' : '') + '>' +
@@ -787,6 +799,7 @@
     if (el('support_notes')) state.supportNotes = el('support_notes').value.trim();
     if (el('ol_school')) state.olSchool = el('ol_school').value.trim();
     if (el('best_contact')) state.bestContact = el('best_contact').value.trim();
+    if (el('support_type')) state.supportTypes = Array.prototype.map.call(dialog.querySelectorAll('input[name="support_type"]:checked'), function (x) { return x.value; });
   }
   function checkout() {
     readSupport();
@@ -794,9 +807,10 @@
     if (state.busy || !state.items.length || (!isFunded && (!state.plan || !state.method))) return;
     state.errors = {}; state.notice = '';
     if (state.support) {
+      if (!state.supportTypes.length) state.errors.support_type = 'Please choose at least one type of support need.';
       if (!state.fundingSource) state.errors.fundingSource = 'Please choose how you\'re planning to pay.';
       if (state.bestContact.length < 3) state.errors.best_contact = 'Please tell us the best way and time to reach you.';
-      if (Object.keys(state.errors).length) { render(state.errors.fundingSource ? 'input[name="fundingSource"]' : 'input[name="best_contact"]'); return; }
+      if (Object.keys(state.errors).length) { render(state.errors.support_type ? 'input[name="support_type"]' : state.errors.fundingSource ? 'input[name="fundingSource"]' : 'input[name="best_contact"]'); return; }
     }
     if (!isFunded && state.method === 'etransfer') {
       var ef = dialog.querySelector('input[name="etransfer_from"]');
@@ -815,7 +829,7 @@
     var f = state.family;
     var body = {
       method: isFunded ? 'funding' : state.method, plan: isFunded ? 'full' : state.plan, policy_ack: true, source: location.pathname.slice(0, 40),
-      support: state.support ? { needs: true, funding_source: state.fundingSource, ol_school: state.fundingSource === 'ol-school' ? state.olSchool : '',
+      support: state.support ? { needs: true, types: state.supportTypes, funding_source: state.fundingSource, ol_school: state.fundingSource === 'ol-school' ? state.olSchool : '',
         notes: state.supportNotes, best_contact: state.bestContact } : { needs: false },
       referred_by: state.referred_by, referrer_email: state.referrer_email, discount_code: priced().some(function (p) { return p.byCode; }) ? state.code : '', etransfer_from: !isFunded && state.method === 'etransfer' ? state.etransfer_from : '',
       family: { parent_name: f.parent_name, email: f.email, phone: f.phone, street_address: f.street_address, city: f.city, province: f.province, postal_code: f.postal_code },
