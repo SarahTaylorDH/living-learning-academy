@@ -91,7 +91,9 @@
     family: { province: 'BC' }, confirm: { email2: '' }, kidEdit: {}, familyBefore: null, child: {}, childPick: '', items: [], policy_ack: false, referred_by: '', referrer_email: '',
     plan: '', method: '', etransfer_from: '', householdPrior: false, householdKey: '',
     code: '', codePercent: 0, codeCents: 0, codeNotice: '', codeError: '',
-    result: null, bot: false
+    result: null, bot: false,
+    // Support needs and funding (payment step). Saved with the order; support@ contacts the family.
+    support: false, supportNotes: '', fundingSource: '', olSchool: '', bestContact: ''
   };
   var openedAt = Date.now();
 
@@ -150,6 +152,7 @@
   }
   function clearCart() {
     state.items = []; state.code = ''; state.codePercent = 0; state.codeError = ''; state.plan = ''; state.method = ''; state.etransfer_from = '';
+    state.support = false; state.supportNotes = ''; state.fundingSource = ''; state.olSchool = ''; state.bestContact = '';
     try { localStorage.removeItem(CART_KEY); } catch (e) {}
     renderBar();
   }
@@ -272,7 +275,7 @@
     var steps = idx < 0 ? '' : '<ol class="reg-steps" aria-label="Step ' + (idx + 1) + ' of 4">' + STEPS.map(function (s, i) { return '<li class="' + (i <= idx ? 'on' : '') + '"></li>'; }).join('') + '</ol>';
     var title = (state.step === 'details' || state.step === 'form' || state.step === 'full') && c
       ? '<p class="reg-dialog__tags">' + tag(c) + '<span class="reg-when">Fridays · ' + esc(c.time) + ' · Ages ' + esc(c.ages) + '</span></p><h2 id="reg-title">' + esc(c.name) + '</h2>' + subtitle(c)
-      : '<h2 id="reg-title">' + ({ cart: 'Your Registration', edit: 'Your Details', pick: 'Add a Course', pay: 'Payment', thanks: 'Thank You', paid: 'Thank You' }[state.step] || 'Register') + '</h2>';
+      : '<h2 id="reg-title">' + ({ cart: 'Your Registration', edit: 'Your Details', pick: 'Add a Course', pay: 'Payment', thanks: 'Thank You', paid: 'Thank You', support: 'Thank You' }[state.step] || 'Register') + '</h2>';
     return '<div class="reg-dialog__head"><div>' + title + '</div>' +
       '<button type="button" class="reg-x" data-close aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       steps;
@@ -519,11 +522,41 @@
     return '<label class="reg-seg__opt' + (on ? ' is-on' : '') + '"><input type="radio" name="' + name + '" value="' + v + '"' + (on ? ' checked' : '') + '><span><b>' + title + '</b><small>' + sub + '</small></span></label>';
   }
 
+  // Support needs and funding: a short section at the top of the payment step.
+  var FUNDING = [['self-pay', 'I\'ll pay myself', 'by card or e-Transfer, below'], ['ol-school', 'OL school learning funds', 'online learning school'],
+    ['autism-funding', 'Autism Funding', 'BC government funding'], ['other', 'Other funding', ''], ['not-sure', 'Not sure', 'please help me']];
+  function funded() { return state.support && state.fundingSource && state.fundingSource !== 'self-pay'; }
+  function supportBox() {
+    var e = state.errors;
+    var html = '<div class="reg-support">' +
+      '<label class="reg-check"><input type="checkbox" name="support"' + (state.support ? ' checked' : '') + '> <span><strong>My child has a disability or additional support needs.</strong> Help us plan for them.</span></label>';
+    if (!state.support) return html + '</div>';
+    return html +
+      '<p class="reg-note">Students with disabilities and additional support needs are welcome at LLA. A few quick questions help us plan the right support and, if you\'re using funding, help you get it in place. Your answers are private.</p>' +
+      '<div class="reg-fields" style="grid-template-columns:1fr">' +
+        '<div><label for="reg-support_notes">In a few words, what helps your child do well in a group? <span style="font-weight:400">(optional)</span></label>' +
+          '<textarea id="reg-support_notes" name="support_notes" rows="3" maxlength="600">' + esc(state.supportNotes) + '</textarea>' +
+          '<span class="reg-note" style="display:block;margin-top:6px">No medical details needed here. We\'ll talk about the rest by phone.</span></div>' +
+      '</div>' +
+      '<p class="reg-label" style="margin:12px 0 10px">How are you planning to pay?</p>' +
+      '<div class="reg-seg reg-seg--stack">' + FUNDING.map(function (f) { return seg('fundingSource', f[0], f[1], f[2]); }).join('') + '</div>' +
+      (e.fundingSource ? '<span class="reg-err" role="alert">' + esc(e.fundingSource) + '</span>' : '') +
+      '<div class="reg-fields" style="grid-template-columns:1fr;margin-top:12px">' +
+        (state.fundingSource === 'ol-school' ? '<div><label for="reg-ol_school">OL school name <span style="font-weight:400">(optional)</span></label><input id="reg-ol_school" name="ol_school" type="text" maxlength="120" value="' + esc(state.olSchool) + '"></div>' : '') +
+        '<div><label for="reg-best_contact">Best way and time to reach you</label>' +
+          '<input id="reg-best_contact" name="best_contact" type="text" maxlength="200" placeholder="e.g. Text, weekday evenings" value="' + esc(state.bestContact) + '"' + (e.best_contact ? ' aria-invalid="true"' : '') + '>' +
+          (e.best_contact ? '<span class="reg-err" role="alert">' + esc(e.best_contact) + '</span>' : '<span class="reg-note" style="display:block;margin-top:6px">Phone, text or email, and the days and times that work best.</span>') + '</div>' +
+      '</div></div>';
+  }
+
   function viewPay() {
     var t = totals(), busy = state.busy ? ' disabled aria-busy="true"' : '';
     var n = state.items.length;
     var action = '';
-    if (state.plan && state.method === 'card') {
+    if (funded()) {
+      action = '<button type="button" class="btn btn--gold" data-checkout' + busy + '>' + (state.busy ? 'Saving…' : 'Submit &amp; Hold My Spot' + (n === 1 ? '' : 's') + ' <span aria-hidden="true">→</span>') + '</button>' +
+        '<p class="reg-note">No payment today. ' + (n === 1 ? 'Your spot is' : 'Your spots are') + ' held while our support team contacts you about support and funding.</p>';
+    } else if (state.plan && state.method === 'card') {
       action = '<button type="button" class="btn btn--gold" data-checkout' + busy + '>' + (state.busy ? 'Opening secure checkout…' : 'Continue to Secure Checkout <span aria-hidden="true">→</span>') + '</button>' +
         '<p class="reg-note">Pay by debit or credit card through Square\'s secure checkout.</p>';
     } else if (state.plan === 'full' && state.method === 'etransfer') {
@@ -535,7 +568,8 @@
     }
     return '<div class="reg-body">' +
       (state.notice ? '<p class="reg-warn">' + state.notice + '</p>' : '') +
-      '<div class="reg-paybox">' +
+      supportBox() +
+      (funded() ? '' : '<div class="reg-paybox">' +
         '<div class="reg-seg">' +
           seg('plan', 'monthly', 'Pay monthly', money(t.monthly) + '/month for ' + MONTHS + ' months') +
           seg('plan', 'full', 'Pay in full', 'one payment') +
@@ -550,7 +584,7 @@
             '</div>' +
             (state.method === 'etransfer' ? '<p class="reg-note reg-hint">Preferred: there are no card fees, so more of your payment goes to your child\'s learning.</p>' : '')
           : '') +
-      '</div>' +
+      '</div>') +
       action +
       '<p class="reg-note reg-fine">By registering, you agree to our <a href="/terms/#registration" target="_blank" rel="noopener">Registration Terms</a> and <a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>' +
       '<div class="reg-foot"><button type="button" class="reg-link" data-go="cart">← Back</button></div>' +
@@ -591,7 +625,22 @@
           '<p><span>To</span><strong>' + esc(r.to || ETRANSFER_EMAIL) + '</strong></p>' +
           '<p><span>Message</span><strong>' + esc(r.message || '') + '</strong></p>' +
         '</div><p class="reg-note">We\'ve emailed you these details too. Once your e-Transfer arrives, we\'ll email a thank-you with the address. More details will follow before the first class.</p></div>' : '') +
+      (r.support ? '<p class="reg-note reg-hint">Thank you for telling us about your child\'s support needs. Our support team will contact you at the time you chose.</p>' : '') +
       (names ? '<p style="text-align:center">Our mentors look forward to helping ' + esc(names) + ' build confidence, character and real-world skills!</p>' : '') +
+      closing() +
+      '</div>';
+  }
+
+  // Support needs + funding: registered, spot held, we'll call.
+  function viewSupport() {
+    var r = state.result || {};
+    var names = joinNames(r.kids || []);
+    return '<div class="reg-body">' +
+      '<div class="reg-thanks"><p class="eyebrow" style="margin:0 0 8px">Thank You</p>' +
+        '<h3>We\'ve received ' + (names ? esc(names) + '\'s registration' : 'your registration') + '!</h3>' +
+        '<p style="color:var(--muted)">Because you told us your child has a disability or additional support needs, someone from our support team will contact you at the time you chose to talk about the right support and, if needed, funding.</p></div>' +
+      '<div class="reg-paycard"><p class="reg-label">Your ' + (r.count > 1 ? 'spots are' : 'spot is') + ' held while we connect</p>' +
+        '<p class="reg-note" style="margin:0">If we can\'t reach you within 48 hours of our first try, the spot will be released. You can always email <a href="mailto:support@livinglearningacademy.com">support@livinglearningacademy.com</a> to set up a call and rejoin if spots are still available. We\'ve emailed you these details too.</p></div>' +
       closing() +
       '</div>';
   }
@@ -607,7 +656,7 @@
   }
 
   function render(focusSelector) {
-    var views = { details: viewDetails, form: viewForm, cart: viewCart, edit: viewEdit, pick: viewPick, pay: viewPay, thanks: viewThanks, paid: viewPaid, full: viewFull };
+    var views = { details: viewDetails, form: viewForm, cart: viewCart, edit: viewEdit, pick: viewPick, pay: viewPay, thanks: viewThanks, paid: viewPaid, support: viewSupport, full: viewFull };
     dialog.innerHTML = head() + views[state.step]();
     var target = focusSelector && dialog.querySelector(focusSelector);
     (target || dialog).focus();
@@ -641,7 +690,7 @@
     overlay.hidden = true;
     document.body.classList.remove('reg-lock');
     state.course = null;
-    if (state.step === 'thanks' || state.step === 'paid') state.step = 'details';
+    if (state.step === 'thanks' || state.step === 'paid' || state.step === 'support') state.step = 'details';
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
     if (state.opener && state.opener.focus) state.opener.focus();
     state.opener = null;
@@ -733,27 +782,42 @@
   }
 
   // ------------------------------------------------------------ checkout
+  function readSupport() {
+    var el = function (n) { return dialog.querySelector('[name="' + n + '"]'); };
+    if (el('support_notes')) state.supportNotes = el('support_notes').value.trim();
+    if (el('ol_school')) state.olSchool = el('ol_school').value.trim();
+    if (el('best_contact')) state.bestContact = el('best_contact').value.trim();
+  }
   function checkout() {
-    if (state.busy || !state.plan || !state.method || !state.items.length) return;
+    readSupport();
+    var isFunded = funded();
+    if (state.busy || !state.items.length || (!isFunded && (!state.plan || !state.method))) return;
     state.errors = {}; state.notice = '';
-    if (state.method === 'etransfer') {
+    if (state.support) {
+      if (!state.fundingSource) state.errors.fundingSource = 'Please choose how you\'re planning to pay.';
+      if (state.bestContact.length < 3) state.errors.best_contact = 'Please tell us the best way and time to reach you.';
+      if (Object.keys(state.errors).length) { render(state.errors.fundingSource ? 'input[name="fundingSource"]' : 'input[name="best_contact"]'); return; }
+    }
+    if (!isFunded && state.method === 'etransfer') {
       var ef = dialog.querySelector('input[name="etransfer_from"]');
       state.etransfer_from = ef ? ef.value.trim() : state.family.email;
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.etransfer_from)) { state.errors.etransfer_from = 'Please enter the email you\'ll send the e-Transfer from.'; render('input[name="etransfer_from"]'); return; }
     }
     var list = priced();
-    var summary = { kids: kids().map(function (k) { return k.first; }), count: list.length, total: totals().full,
+    var summary = { kids: kids().map(function (k) { return k.first; }), count: list.length, total: totals().full, support: state.support,
       discount: list.some(function (p) { return p.discount; }), to: ETRANSFER_EMAIL,
       message: list.map(function (p) { return (p.course.ref || p.course.name) + ' ' + p.item.child.first; }).join(', ') };
-    if (state.bot) { state.result = summary; clearCart(); state.step = state.method === 'card' ? 'paid' : 'thanks'; render(); return; }
+    if (state.bot) { state.result = summary; clearCart(); state.step = isFunded ? 'support' : state.method === 'card' ? 'paid' : 'thanks'; render(); return; }
     if (!CONNECTED) {
       state.notice = 'Online checkout isn\'t available right now. Please email <a href="mailto:' + esc(CONTACT) + '">' + esc(CONTACT) + '</a> and we\'ll register you.';
       render(); return;
     }
     var f = state.family;
     var body = {
-      method: state.method, plan: state.plan, policy_ack: true, source: location.pathname.slice(0, 40),
-      referred_by: state.referred_by, referrer_email: state.referrer_email, discount_code: priced().some(function (p) { return p.byCode; }) ? state.code : '', etransfer_from: state.method === 'etransfer' ? state.etransfer_from : '',
+      method: isFunded ? 'funding' : state.method, plan: isFunded ? 'full' : state.plan, policy_ack: true, source: location.pathname.slice(0, 40),
+      support: state.support ? { needs: true, funding_source: state.fundingSource, ol_school: state.fundingSource === 'ol-school' ? state.olSchool : '',
+        notes: state.supportNotes, best_contact: state.bestContact } : { needs: false },
+      referred_by: state.referred_by, referrer_email: state.referrer_email, discount_code: priced().some(function (p) { return p.byCode; }) ? state.code : '', etransfer_from: !isFunded && state.method === 'etransfer' ? state.etransfer_from : '',
       family: { parent_name: f.parent_name, email: f.email, phone: f.phone, street_address: f.street_address, city: f.city, province: f.province, postal_code: f.postal_code },
       items: state.items.map(function (it) {
         return { course_id: it.course, child_first_name: it.child.first, child_last_name: it.child.last, child_age: it.child.age, child_gender: it.child.gender };
@@ -773,6 +837,10 @@
         var j = res.j || {};
         if (res.ok && j.checkout_url) { location.href = j.checkout_url; return; }   // card: Square, then back to ?order=
         state.busy = false;
+        if (res.ok && j.method === 'funding') {
+          state.result = summary; clearCart(); loadSpots();
+          state.step = 'support'; render(); return;
+        }
         if (res.ok && j.method === 'etransfer') {
           summary.total = j.total_cents; summary.message = j.etransfer_message; summary.to = j.etransfer_to || ETRANSFER_EMAIL;
           summary.discount = (j.items || []).some(function (i) { return i.family_discount; });
@@ -828,7 +896,17 @@
   // Payment screen: picking an option redraws it (Pay in full adds e-Transfer / card).
   dialog.addEventListener('change', function (e) {
     var r = e.target;
+    if (r.name === 'support' || r.name === 'fundingSource') {
+      readSupport();
+      if (r.name === 'support') state.support = r.checked; else state.fundingSource = r.value;
+      delete state.errors.fundingSource;
+      var keep = overlay.scrollTop;
+      render('input[name="' + r.name + '"]' + (r.name === 'support' ? '' : ':checked'));
+      overlay.scrollTop = keep;
+      return;
+    }
     if (r.type !== 'radio' || (r.name !== 'plan' && r.name !== 'method')) return;
+    readSupport();
     state[r.name] = r.value;
     if (r.name === 'plan') state.method = r.value === 'monthly' ? 'card' : '';
     var top = overlay.scrollTop;
