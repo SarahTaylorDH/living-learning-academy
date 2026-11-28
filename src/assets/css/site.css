@@ -452,3 +452,6 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .values-legend__btn:hover, .values-legend__btn:focus-visible { text-decoration-color: var(--gold); }
 .values-legend__btn .tag { font-size: 10px; padding: 3px 6px; }
 .values-legend__i { color: var(--gold-dark); font-size: 14px; text-decoration: none; }
+
+.code-list { padding-left: 22px; display: grid; gap: 14px; }
+.code-list li::marker { color: var(--gold); font-weight: 700; }
