@@ -247,7 +247,7 @@
           '<span class="reg-card__blurb">' + esc(c.blurb) + '</span>' +
           '<span class="reg-learn">' + c.learn.map(function (l) { return '<span>' + esc(l) + '</span>'; }).join('') + '</span>' +
           '<span class="reg-mentor"><span class="reg-mentor__label">Your Mentor</span><span class="reg-mentor__name">' + esc(c.mentor) + '</span><span class="reg-mentor__creds">' + esc(c.creds) + '</span></span>' +
-          '<span class="reg-card__foot"><span class="reg-price">' + money(c.monthly || MONTHLY) + '<small> per month</small><small class="reg-price__alt">Course runs ' + MONTHS + ' months &middot; ' + money(c.price || PRICE) + ' total</small></span><span class="btn btn--gold">' + (isFull(c) ? 'Full · Join Waitlist' : 'Details &amp; Register') + ' <span aria-hidden="true">→</span></span></span>' +
+          '<span class="reg-card__foot"><span class="reg-price">' + money(c.monthly || MONTHLY) + '<small> per month</small><small class="reg-price__alt">Course runs ' + MONTHS + ' months &middot; ' + money(c.price || PRICE) + ' total</small><small class="reg-price__alt">OL school and Autism Funding accepted</small></span><span class="btn btn--gold">' + (isFull(c) ? 'Full · Join Waitlist' : 'Details &amp; Register') + ' <span aria-hidden="true">→</span></span></span>' +
           '</button></li>';
       }).join('');
       Array.prototype.forEach.call(cards.querySelectorAll('[data-course-card]'), function (li) { li.remove(); });
@@ -297,6 +297,7 @@
       '</div>' +
       '<div class="reg-foot"><div class="reg-cost"><p><span class="reg-price" style="font-size:30px">' + money(MONTHLY) + '<small> per month</small></span></p><p class="reg-price__note">This course runs ' + MONTHS + ' months (8 weeks). Pay ' + money(MONTHLY) + ' a month or in full.</p>' +
         '<p class="reg-note">Pay monthly, or pay in full</p>' +
+        '<p class="reg-note">OL school and Autism Funding accepted</p>' +
         '<p class="reg-note"><strong>Family discount:</strong> 10% off each additional course in your household</p></div>' +
       (isFull(c)
         ? '<a class="btn btn--gold" href="/join/">Full · Join the Waitlist <span aria-hidden="true">→</span></a></div>'
@@ -550,10 +551,6 @@
       '<div class="reg-seg reg-seg--stack">' + FUNDING.map(function (f) { return seg('fundingSource', f[0], f[1], f[2]); }).join('') + '</div>' +
       (e.fundingSource ? '<span class="reg-err" role="alert">' + esc(e.fundingSource) + '</span>' : '') +
       '<div class="reg-fields" style="grid-template-columns:1fr;margin-top:12px">' +
-        (state.fundingSource === 'ol-school' && priced().some(function (p) { return p.course.fw === 'CW'; })
-          ? '<p class="reg-warn" style="margin:0">Heads up: OL schools usually can\'t fund courses taught from a Christian worldview (CW). ' +
-            esc(joinNames(priced().filter(function (p) { return p.course.fw === 'CW'; }).map(function (p) { return p.course.name; }))) +
-            ' ' + (priced().filter(function (p) { return p.course.fw === 'CW'; }).length > 1 ? 'are' : 'is') + ' CW, so your OL school may not approve it. Our support team will talk it through with you.</p>' : '') +
         (state.fundingSource === 'ol-school' ? '<div><label for="reg-ol_school">OL school name <span style="font-weight:400">(optional)</span></label><input id="reg-ol_school" name="ol_school" type="text" maxlength="120" value="' + esc(state.olSchool) + '"></div>' : '') +
         '<div><label for="reg-best_contact">Best way and time to reach you</label>' +
           '<input id="reg-best_contact" name="best_contact" type="text" maxlength="200" placeholder="e.g. Text, weekday evenings" value="' + esc(state.bestContact) + '"' + (e.best_contact ? ' aria-invalid="true"' : '') + '>' +
@@ -650,7 +647,7 @@
     return '<div class="reg-body">' +
       '<div class="reg-thanks"><p class="eyebrow" style="margin:0 0 8px">Thank You</p>' +
         '<h3>We\'ve received ' + (names ? esc(names) + '\'s registration' : 'your registration') + '!</h3>' +
-        '<p style="color:var(--muted)">Because you told us your child has a disability or additional support needs, someone from our support team will contact you at the time you chose to talk about the right support and, if needed, funding.</p></div>' +
+        '<p style="color:var(--muted)">Because you told us your child has a disability or additional support needs, someone from our support team will contact you at the time you chose to talk about what helps your child do well, whether a support worker would help, your child\'s IEP goals if they have one, and the next steps for funding.</p></div>' +
       '<div class="reg-paycard"><p class="reg-label">Your ' + (r.count > 1 ? 'spots are' : 'spot is') + ' held while we connect</p>' +
         '<p class="reg-note" style="margin:0">If we can\'t reach you within 48 hours of our first try, the spot will be released. You can always email <a href="mailto:support@livinglearningacademy.com">support@livinglearningacademy.com</a> to set up a call and rejoin if spots are still available. We\'ve emailed you these details too.</p></div>' +
       closing() +

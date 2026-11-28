@@ -273,8 +273,19 @@ begin
         '<p>Hi ' || lla_html(split_part(trim(o.parent_name), ' ', 1)) || ',</p>'
         || '<p>Thank you for registering ' || lla_html(lla_join(kids)) || ' with Living Learning Academy! We''re glad you''re here.</p>'
         || lla_order_items_html(o, false)
+        || '<p>LLA courses are small-group, hands-on enrichment: students practise real-world life skills while learning alongside their peers. '
+        || 'They can support and enrich your child''s learning in <strong>Applied Design, Skills and Technologies (ADST)</strong> and <strong>Career Education</strong>, '
+        || 'and build social and communication skills in a group setting.</p>'
         || '<p>Because you told us your child has a disability or additional support needs, someone from our support team will contact you '
-        || '(you asked: <strong>' || lla_html(o.best_contact) || '</strong>) to talk about the right support and, if needed, help you with funding.</p>'
+        || '(you asked: <strong>' || lla_html(o.best_contact) || '</strong>) to:</p>'
+        || '<ul style="padding-left:20px">'
+        || '<li>talk about what helps your child do well, including whether a support worker would help in class</li>'
+        || '<li>connect the course to your child''s IEP goals, if they have an IEP</li>'
+        || '<li>help you with the next steps for ' || lla_html(lla_funding_label(o.funding_source)) || '</li></ul>'
+        || case o.funding_source
+             when 'ol-school' then '<p><strong>Helpful next step:</strong> let your OL teacher know you''d like to use your child''s learning funds for this course. Schools approve providers before services begin, and we''re happy to send your teacher our course description and provider details.</p>'
+             when 'autism-funding' then '<p><strong>Helpful next step:</strong> Autism Funding asks families to authorize a provider before services begin. We''ll walk you through it when we talk.</p>'
+             else '' end
         || '<p><strong>' || case when one then 'Your spot is' else 'Your spots are' end || ' held while we connect.</strong> '
         || 'If we can''t reach you within 48 hours of our first try, the spot will be released. You can always email '
         || '<a href="mailto:support@livinglearningacademy.com">support@livinglearningacademy.com</a> to set up a call and rejoin if spots are still available.</p>'
@@ -333,7 +344,8 @@ begin
   one := jsonb_array_length(o.items) = 1;
   pay := case
     when o.method = 'funding' then 'Payment: through ' || lla_html(lla_funding_label(o.funding_source))
-      || coalesce(' (' || lla_html(o.ol_school) || ')', '') || ', as arranged with our support team.'
+      || coalesce(' (' || lla_html(o.ol_school) || ')', '') || ', as arranged with our support team. '
+      || 'Before the first class, we''ll make sure your child''s mentor and support worker know what helps your child do well.'
     when o.plan = 'monthly' then 'Paid today: <strong>' || lla_money(o.monthly_cents) || '</strong> by card. Your second payment of '
       || lla_money(o.monthly_cents) || ' will be charged to the same card on '
       || to_char((coalesce(o.paid_at, now()) + interval '1 month') at time zone 'America/Vancouver', 'FMMonth FMDD')
