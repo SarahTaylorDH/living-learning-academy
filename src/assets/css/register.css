@@ -175,6 +175,11 @@ body.reg-lock { overflow: hidden; }
 .reg-kv p { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; background: #fff; border: 1px solid #dbe3f0; }
 .reg-kv span { min-width: 76px; font: 700 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .reg-kv strong { font-size: 16px; color: var(--navy); overflow-wrap: anywhere; }
+/* Support needs and funding (payment step) */
+.reg-support { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #fbf7ee; border-left: 3px solid var(--gold); }
+.reg-support textarea { width: 100%; box-sizing: border-box; min-height: 84px; padding: 10px 12px; border: 1px solid #cfc6b5; border-radius: var(--radius); font: 16px/1.5 var(--sans); color: var(--ink); background: #fff; }
+.reg-support .reg-fields label span { letter-spacing: 0; }
+.reg-seg--stack { grid-template-columns: 1fr 1fr; }
 @media (max-width: 480px) { .reg-seg { grid-template-columns: 1fr; } }
 /* Your registration (cart) */
 .reg-cart { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }

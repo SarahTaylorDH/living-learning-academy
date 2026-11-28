@@ -4,6 +4,7 @@
 //   card       -> build a Square checkout for the whole order and send the family to it
 //               (monthly = Square subscription that stops by itself after the set number of payments)
 //   e-Transfer -> return the amount and message to show (the database emails the instructions)
+//   funding    -> no payment; the spot is held and support@ is alerted (the database sends the emails)
 // Secrets: SQUARE_ACCESS_TOKEN. SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 // Settings: "Verify JWT" OFF (the public website calls it).
 
@@ -141,6 +142,10 @@ Deno.serve(async (req) => {
     if (full) return reply({ error: 'course_full', course_id: full[1] }, 409);
     console.error(msg);
     return reply({ error: 'invalid' }, 400);
+  }
+  if (order.method === 'funding') {
+    // Support needs + funding: no payment now. The spot is held and support@ contacts the family.
+    return reply({ order_id: order.order_id, method: 'funding', total_cents: order.total_cents, items: order.items });
   }
   if (order.method === 'etransfer') {
     return reply({ order_id: order.order_id, method: 'etransfer', total_cents: order.total_cents,
