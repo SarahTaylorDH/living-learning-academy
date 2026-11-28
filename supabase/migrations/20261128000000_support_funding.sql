@@ -52,6 +52,16 @@ returns text language sql immutable as $$
     from unnest(p) x), ', '), ''), '(not given)');
 $$;
 
+-- Funding emails: what the course(s) the child is registered in can do for them (no worldview wording).
+create or replace function public.lla_funding_course_text(o public.orders)
+returns text language sql stable set search_path = public as $$
+  select '<p>In <strong>' || lla_html(lla_join(array(select distinct x->>'name' from jsonb_array_elements(o.items) x))) || '</strong>, '
+    || lla_html(lla_join(lla_order_children(o))) || ' will practise real-world life skills in a small, hands-on group alongside peers. '
+    || case when (select count(distinct x->>'name') from jsonb_array_elements(o.items) x) > 1 then 'These courses' else 'The course' end
+    || ' can support and enrich your child''s learning in <strong>Applied Design, Skills and Technologies (ADST)</strong> and <strong>Career Education</strong>, '
+    || 'and build social and communication skills in a group setting.</p>';
+$$;
+
 create or replace function public.lla_funding_label(p text)
 returns text language sql immutable as $$
   select case p
@@ -254,7 +264,7 @@ begin
       || row || 'Phone</td><td>' || lla_html(o.phone) || '</td></tr>'
       || row || 'Best way and time</td><td><strong>' || lla_html(o.best_contact) || '</strong></td></tr>'
       || row || 'Type of support need</td><td><strong>' || lla_html(lla_support_types_label(o.support_types)) || '</strong></td></tr>'
-      || row || 'Paying by</td><td>' || lla_html(lla_funding_label(o.funding_source)) || coalesce(' · ' || lla_html(o.ol_school), '') || '</td></tr>'
+      || row || 'Paying by</td><td>' || lla_html(lla_funding_label(o.funding_source)) || case when o.ol_school is not null then ' · ' || lla_html(o.ol_school) else '' end || '</td></tr>'
       || row || 'What helps their child</td><td>' || coalesce(nullif(lla_html(o.support_notes), ''), '(not given)') || '</td></tr>'
       || '</table>'
       || lla_order_items_html(o, false)
@@ -273,9 +283,7 @@ begin
         '<p>Hi ' || lla_html(split_part(trim(o.parent_name), ' ', 1)) || ',</p>'
         || '<p>Thank you for registering ' || lla_html(lla_join(kids)) || ' with Living Learning Academy! We''re glad you''re here.</p>'
         || lla_order_items_html(o, false)
-        || '<p>LLA courses are small-group, hands-on enrichment: students practise real-world life skills while learning alongside their peers. '
-        || 'They can support and enrich your child''s learning in <strong>Applied Design, Skills and Technologies (ADST)</strong> and <strong>Career Education</strong>, '
-        || 'and build social and communication skills in a group setting.</p>'
+        || lla_funding_course_text(o)
         || '<p>Because you told us your child has a disability or additional support needs, someone from our support team will contact you '
         || '(you asked: <strong>' || lla_html(o.best_contact) || '</strong>) to:</p>'
         || '<ul style="padding-left:20px">'
@@ -283,7 +291,7 @@ begin
         || '<li>connect the course to your child''s IEP goals, if they have an IEP</li>'
         || '<li>help you with the next steps for ' || lla_html(lla_funding_label(o.funding_source)) || '</li></ul>'
         || case o.funding_source
-             when 'ol-school' then '<p><strong>Helpful next step:</strong> let your OL teacher know you''d like to use your child''s learning funds for this course. Schools approve providers before services begin, and we''re happy to send your teacher our course description and provider details.</p>'
+             when 'ol-school' then '<p><strong>Helpful next step:</strong> let your OL teacher know you''d like to use your child''s learning funds for this course, as schools approve providers before services begin. If your teacher asks for anything from us, just let us know.</p>'
              when 'autism-funding' then '<p><strong>Helpful next step:</strong> Autism Funding asks families to authorize a provider before services begin. We''ll walk you through it when we talk.</p>'
              else '' end
         || '<p><strong>' || case when one then 'Your spot is' else 'Your spots are' end || ' held while we connect.</strong> '
@@ -344,7 +352,7 @@ begin
   one := jsonb_array_length(o.items) = 1;
   pay := case
     when o.method = 'funding' then 'Payment: through ' || lla_html(lla_funding_label(o.funding_source))
-      || coalesce(' (' || lla_html(o.ol_school) || ')', '') || ', as arranged with our support team. '
+      || case when o.ol_school is not null then ' (' || lla_html(o.ol_school) || ')' else '' end || ', as arranged with our support team. '
       || 'Before the first class, we''ll make sure your child''s mentor and support worker know what helps your child do well.'
     when o.plan = 'monthly' then 'Paid today: <strong>' || lla_money(o.monthly_cents) || '</strong> by card. Your second payment of '
       || lla_money(o.monthly_cents) || ' will be charged to the same card on '
@@ -361,6 +369,7 @@ begin
       || ', and ' || lla_html(lla_join(kids)) || ' '
       || case when array_length(kids, 1) > 1 then 'are' else 'is' end || ' all set.</p>'
       || lla_order_items_html(o, true)
+      || case when o.method = 'funding' then lla_funding_course_text(o) else '' end
       || '<p>' || pay || '</p>'
       || '<p>Our mentors look forward to helping ' || lla_html(lla_join(kids)) || ' build confidence, character and real-world skills!</p>'
       || '<p><strong>Know a family who would love LLA?</strong> When they register and add your name, you get $20 off.</p>'
@@ -399,7 +408,7 @@ begin
       || lla_html(new.parent_name) || ' · ' || lla_html(new.email) || ' · ' || lla_html(new.phone) || '</p>'
       || lla_order_items_html(new, false)
       || '<p>' || case
-           when new.method = 'funding' then 'Funding: ' || lla_html(lla_funding_label(new.funding_source)) || coalesce(' (' || lla_html(new.ol_school) || ')', '')
+           when new.method = 'funding' then 'Funding: ' || lla_html(lla_funding_label(new.funding_source)) || case when new.ol_school is not null then ' (' || lla_html(new.ol_school) || ')' else '' end
              || ', ' || lla_money(new.total_cents) || ' for the full term. Invoice the funder (or the family, for OL schools that need it) per the support plan.'
            else case new.method when 'etransfer' then 'e-Transfer' else 'Card' end || ', '
              || case when new.plan = 'monthly' then lla_money(new.monthly_cents) || ' a month for ' || new.months || ' months (ends by itself)'
